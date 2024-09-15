@@ -7,8 +7,8 @@ Create Date: 2024-09-15 16:43:19.471061
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from fastapi_users_db_sqlalchemy.generics import GUID
 
 revision: str = '1053f442c1aa'
