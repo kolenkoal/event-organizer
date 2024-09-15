@@ -2,7 +2,7 @@ from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class DBSettings(BaseSettings):
+class DatabaseSettings(BaseSettings):
     url: PostgresDsn
     echo: bool = False
     echo_pool: bool = False

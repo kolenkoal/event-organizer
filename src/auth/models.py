@@ -7,8 +7,13 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.models import Base
 
 
-class AccessToken(Base, SQLAlchemyBaseAccessTokenTableUUID):
-    user_id: Mapped[GUID] = mapped_column(GUID, ForeignKey("users.id", ondelete="cascade"), nullable=False)
+class AccessToken(  # type: ignore[misc]
+    Base,
+    SQLAlchemyBaseAccessTokenTableUUID,
+):
+    user_id: Mapped[GUID] = mapped_column(  # type: ignore[assignment]
+        GUID, ForeignKey("users.id", ondelete="cascade"), nullable=False
+    )
 
     @classmethod
     def get_db(cls, session: AsyncSession) -> SQLAlchemyAccessTokenDatabase:
