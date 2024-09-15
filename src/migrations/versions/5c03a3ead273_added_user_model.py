@@ -7,10 +7,9 @@ Create Date: 2024-09-15 16:15:03.732375
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from fastapi_users_db_sqlalchemy.generics import GUID
-
 
 # revision identifiers, used by Alembic.
 revision: str = '5c03a3ead273'
