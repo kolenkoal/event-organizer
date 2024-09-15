@@ -1,24 +1,6 @@
-[tool.poetry]
-name = "event-organizer"
-version = "0.1.0"
-description = ""
-authors = ["kolenkoal <kolenko.alexander0@gmail.com>"]
-readme = "README.md"
-package-mode = false
-
-[tool.poetry.dependencies]
-python = "^3.12"
-urllib3 = "^2.2.3"
-
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
-isort = "^5.13.2"
-ruff = "^0.6.5"
-
 [build-system]
-requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
 
 [tool.isort]
 balanced_wrapping = true
@@ -30,12 +12,13 @@ skip = ["__init__.py"]
 use_parentheses = true
 
 [tool.mypy]
+cache_dir = ".mypy_cache"
 disallow_any_generics = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
+exclude = ["migrations"]
 implicit_optional = true
 namespace_packages = true
-exclude = ["migrations"]
 plugins = ["pydantic.mypy"]
 show_error_codes = true
 warn_redundant_casts = true
@@ -43,11 +26,29 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_ignores = true
 
+[tool.poetry]
+authors = ["kolenkoal <kolenko.alexander0@gmail.com>"]
+description = ""
+name = "event-organizer"
+package-mode = false
+readme = "README.md"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+urllib3 = "^2.2.3"
+pydantic = "^2.9.1"
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.13.2"
+mypy = "^1.11.2"
+pytest = "^8.3.3"
+ruff = "^0.6.5"
+toml-sort = "^0.23.1"
 
 [tool.pydantic-mypy]
 init_firbid_extra = true
 warn_untyped_fields = true
-
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers --showlocals --verbosity 2"
@@ -61,13 +62,13 @@ filterwarnings = [
 log_level = "DEBUG"
 
 [tool.ruff]
+exclude = [
+  "*/migrations",
+  ".git",
+  ".venv"
+]
 indent-width = 4
 line-length = 120
-exclude = [
-    "*/migrations",
-    ".git",
-    ".venv"
-]
 target-version = "py312"
 
 [tool.ruff.format]

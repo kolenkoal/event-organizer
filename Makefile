@@ -4,8 +4,9 @@ PYTHON = 3.12
 
 .PHONY: init
 init:
-	poetry config virtualenvs.in-project true
-	poetry env use $(PYTHON)
+	poetry config virtualenvs.create true --local
+	poetry config virtualenvs.in-project true --local
+	poetry env use python$(PYTHON)
 	poetry shell
 	poetry install --no-interaction --no-ansi
 .PHONY: test
@@ -21,13 +22,8 @@ plint:
 	poetry run isort $(CODE)
 	poetry run ruff format $(CODE)
 	poetry run ruff check --fix $(CODE)
-	poetry run trailing-whitespace-fixer
-	poetry run end-of-file-fixer
 	poetry run toml-sort pyproject.toml --all --in-place
 
-	poetry run check-json
-	poetry run check-toml
-	poetry run check-yaml
 	poetry run ruff check $(CODE)
 	poetry run isort --check-only $(CODE)
 	make mypy
