@@ -35,14 +35,19 @@ readme = "README.md"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
+fastapi = "^0.114.2"
+pydantic = "^2.9.1"
+pydantic-settings = "^2.5.2"
 python = "^3.12"
 urllib3 = "^2.2.3"
-pydantic = "^2.9.1"
+uvicorn = "^0.30.6"
+uvloop = "^0.20.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.13.2"
 mypy = "^1.11.2"
 pytest = "^8.3.3"
+pytest-deadfixtures = "^2.2.1"
 ruff = "^0.6.5"
 toml-sort = "^0.23.1"
 
