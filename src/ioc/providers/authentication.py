@@ -43,7 +43,7 @@ class AuthenticationProvider(Provider):
         return AuthenticationBackend(
             name="access-tokens-db",
             transport=bearer_transport,
-            get_strategy=self.get_database_strategy,  # todo
+            get_strategy=self.get_database_strategy,  # TODO: проверить, что все ок
         )
 
 

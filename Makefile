@@ -30,3 +30,7 @@ plint:
 	poetry run pytest --dead-fixtures --dup-fixtures
 	poetry check
 	poetry run toml-sort pyproject.toml --all --in-place --check
+
+#.PHONY: update-env
+#update-env:
+	#source <(sed -E -n 's/[^#]+/export &/ p' .env)
