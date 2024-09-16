@@ -1,6 +1,9 @@
+import uuid
 from typing import Annotated, AsyncGenerator
 
 from dishka import FromComponent, Provider, Scope, provide
+from fastapi_users import FastAPIUsers
+from fastapi_users.authentication import AuthenticationBackend
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,8 +23,15 @@ class UserProvider(Provider):
         yield User.get_db(session)
 
     @provide()
-    async def get_user_manager(self, users_db: SQLAlchemyUserDatabase) -> UserManager:
+    async def get_user_manager(self, users_db: SQLAlchemyUserDatabase) -> AsyncGenerator[UserManager, None]:
         yield UserManager(users_db)
+
+    @provide()
+    async def get_fastapi_users(self, auth_backend: Annotated[AuthenticationBackend, FromComponent(Component.COMMON)]) -> FastAPIUsers[User, uuid.UUID]:
+        return FastAPIUsers[User, uuid.UUID](
+            self.get_user_manager,
+            [auth_backend],
+        )
 
 
 def get_user_provider() -> Provider:

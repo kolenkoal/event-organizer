@@ -1,7 +1,7 @@
 import logging
 import uuid
 
-from fastapi import Depends, Request
+from fastapi import Request
 from fastapi_users import BaseUserManager, UUIDIDMixin
 
 from users.models import User
@@ -17,6 +17,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     async def on_after_register(self, user: User, request: Request | None = None):
         logger.info("User %s has registered.", user.id)
 
+    # TODO: убрать комменты
     # async def on_after_forgot_password(
     #     self, user: User, token: str, request: Request | None = None
     # ):
