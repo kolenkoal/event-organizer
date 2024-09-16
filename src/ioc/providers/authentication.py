@@ -1,6 +1,7 @@
 from typing import Annotated, AsyncGenerator
 
 from dishka import FromComponent, Provider, Scope, provide
+from fastapi_users.authentication import AuthenticationBackend, BearerTransport
 from fastapi_users.authentication.strategy.db import DatabaseStrategy
 from fastapi_users_db_sqlalchemy.access_token import SQLAlchemyAccessTokenDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,6 +33,18 @@ class AuthenticationProvider(Provider):
     @provide()
     def get_database_strategy(self, access_token_db: SQLAlchemyAccessTokenDatabase[AccessToken]) -> DatabaseStrategy:
         return DatabaseStrategy(access_token_db, lifetime_seconds=self._config.authentication_settings.lifetime_seconds)
+
+    @provide()
+    def get_bearer_transport(self) -> BearerTransport:
+        return BearerTransport(tokenUrl="auth/jwt/token")  # TODO: update URL
+
+    @provide()
+    def get_auth_backend(self, bearer_transport: BearerTransport) -> AuthenticationBackend:
+        return AuthenticationBackend(
+            name="access-tokens-db",
+            transport=bearer_transport,
+            get_strategy=self.get_database_strategy,  # todo
+        )
 
 
 def get_authentication_provider() -> Provider:
