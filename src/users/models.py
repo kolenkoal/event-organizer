@@ -12,4 +12,4 @@ class User(Base, SQLAlchemyBaseUserTableUUID):  # type: ignore[misc]
 
     @classmethod
     def get_db(cls, session: AsyncSession) -> SQLAlchemyUserDatabase:
-        return SQLAlchemyUserDatabase(session, User)
+        return SQLAlchemyUserDatabase(session, cls)

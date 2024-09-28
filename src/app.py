@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from src.auth.routes import auth_router
 
 
 def create_app() -> FastAPI:
@@ -10,5 +12,10 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    router = APIRouter(prefix="/api/v1")
+    router.include_router(auth_router)
+
+    app.include_router(router)
 
     return app

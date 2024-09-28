@@ -8,7 +8,7 @@ class ServerSettings(BaseSettings):
     reload: bool = False
     loop: Literal["none", "auto", "asyncio", "uvloop"] = "uvloop"
     host: str = "0.0.0.0"
-    port: int = 5000
+    port: int = 8080
     backlog: int = 2048
 
     model_config = SettingsConfigDict(env_prefix="SERVER_", strict=False)
