@@ -16,8 +16,8 @@ def create_app() -> FastAPI:
 
     router = APIRouter(prefix="/api/v1")
     router.include_router(auth_router)
+    router.include_router(users_router)
 
     app.include_router(router)
-    app.include_router(users_router)
 
     return app
