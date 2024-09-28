@@ -1,3 +1,6 @@
+from uuid import UUID
+
+from fastapi_users.authentication.strategy import AccessTokenProtocol
 from fastapi_users_db_sqlalchemy.access_token import SQLAlchemyAccessTokenDatabase, SQLAlchemyBaseAccessTokenTableUUID
 from fastapi_users_db_sqlalchemy.generics import GUID
 from sqlalchemy import ForeignKey
@@ -16,5 +19,5 @@ class AccessToken(  # type: ignore[misc]
     )
 
     @classmethod
-    def get_db(cls, session: AsyncSession) -> SQLAlchemyAccessTokenDatabase:
-        return SQLAlchemyAccessTokenDatabase(session, cls)
+    def get_db(cls, session: AsyncSession) -> SQLAlchemyAccessTokenDatabase[AccessTokenProtocol[UUID]]:
+        return SQLAlchemyAccessTokenDatabase(session, cls)  # type: ignore[arg-type]

@@ -1,9 +1,12 @@
 from typing import Annotated, AsyncGenerator
+from uuid import UUID
 
 from fastapi import Depends
 from fastapi_users.authentication import AuthenticationBackend, BearerTransport
+from fastapi_users.authentication.strategy import AccessTokenProtocol
 from fastapi_users.authentication.strategy.db import AccessTokenDatabase, DatabaseStrategy
 from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users.models import UserProtocol
 from fastapi_users_db_sqlalchemy.access_token import SQLAlchemyAccessTokenDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,13 +19,13 @@ from src.users.models import User
 
 async def get_access_token_db(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-) -> AsyncGenerator[SQLAlchemyAccessTokenDatabase, None]:
+) -> AsyncGenerator[SQLAlchemyAccessTokenDatabase[AccessTokenProtocol[UUID]], None]:
     yield AccessToken.get_db(session=session)
 
 
 async def get_user_db(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-) -> AsyncGenerator[SQLAlchemyUserDatabase, None]:
+) -> AsyncGenerator[SQLAlchemyUserDatabase[UserProtocol[UUID], User], None]:
     yield User.get_db(session)
 
 
@@ -31,7 +34,7 @@ def get_database_strategy(
         AccessTokenDatabase[AccessToken],
         Depends(get_access_token_db),
     ],
-) -> DatabaseStrategy:
+) -> DatabaseStrategy:  # type: ignore[type-arg]
     return DatabaseStrategy(database=access_token_db, lifetime_seconds=AuthenticationSettings().lifetime_seconds)
 
 
@@ -40,9 +43,9 @@ def get_bearer_transport() -> BearerTransport:
 
 
 async def get_user_manager(
-    users_db: Annotated[SQLAlchemyUserDatabase, Depends(get_user_db)],
+    users_db: Annotated[SQLAlchemyUserDatabase[UserProtocol[UUID], User], Depends(get_user_db)],
 ) -> AsyncGenerator[UserManager, None]:
-    yield UserManager(users_db)
+    yield UserManager(users_db)  # type: ignore[arg-type]
 
 
 auth_backend = AuthenticationBackend(
