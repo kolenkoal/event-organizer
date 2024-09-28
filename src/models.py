@@ -1,7 +1,6 @@
-import datetime
 
-from sqlalchemy import MetaData, func
-from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
+from sqlalchemy import MetaData
+from sqlalchemy.orm import DeclarativeBase, declared_attr
 
 from src.utils import camel_case_to_snake_case
 
@@ -22,5 +21,3 @@ class Base(DeclarativeBase):
     @declared_attr.directive
     def __tablename__(cls) -> str:
         return f"{camel_case_to_snake_case(cls.__name__)}s"
-
-    created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now(), deferred=True)

@@ -36,7 +36,7 @@ def get_database_strategy(
 
 
 def get_bearer_transport() -> BearerTransport:
-    return BearerTransport(tokenUrl="auth/jwt/token")  # TODO: update URL
+    return BearerTransport(tokenUrl="api/v1/auth/login")  # TODO: update URL
 
 
 async def get_user_manager(
