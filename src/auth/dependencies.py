@@ -36,7 +36,7 @@ def get_database_strategy(
 
 
 def get_bearer_transport() -> BearerTransport:
-    return BearerTransport(tokenUrl="api/v1/auth/login")  # TODO: update URL
+    return BearerTransport(tokenUrl="api/v1/auth/login")
 
 
 async def get_user_manager(
@@ -46,7 +46,5 @@ async def get_user_manager(
 
 
 auth_backend = AuthenticationBackend(
-    name="access-tokens-db",
-    transport=get_bearer_transport(),
-    get_strategy=get_database_strategy,  # TODO: проверить, что все ок
+    name="access-tokens-db", transport=get_bearer_transport(), get_strategy=get_database_strategy
 )
