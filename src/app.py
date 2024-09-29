@@ -1,4 +1,4 @@
-from fastapi import APIRouter, FastAPI, Depends
+from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.auth.routes import auth_router
