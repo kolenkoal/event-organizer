@@ -1,3 +1,6 @@
+import datetime
+
+
 def camel_case_to_snake_case(input_str: str) -> str:
     chars = []
     for c_idx, char in enumerate(input_str):
@@ -11,3 +14,8 @@ def camel_case_to_snake_case(input_str: str) -> str:
                 chars.append("_")
         chars.append(char.lower())
     return "".join(chars)
+
+
+def remove_timezone(dt: datetime.datetime) -> datetime.datetime:
+    """Убираем временную зону из datetime."""
+    return dt.replace(tzinfo=None) if dt.tzinfo else dt
