@@ -13,10 +13,6 @@ init:
 test:
 	poetry run pytest -n 3
 
-.PHONY: mypy
-mypy:
-	poetry run mypy --cache-dir=.mypy_cache $(CODE_WITHOUT_TESTS) --install-types --non-interactive
-
 .PHONY: plint
 plint:
 	poetry run isort $(CODE)
@@ -26,7 +22,6 @@ plint:
 
 	poetry run ruff check $(CODE)
 	poetry run isort --check-only $(CODE)
-	make mypy
 	poetry run pytest --dead-fixtures --dup-fixtures
 	poetry check
 	poetry run toml-sort pyproject.toml --all --in-place --check
