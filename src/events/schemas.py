@@ -1,3 +1,4 @@
+import enum
 from datetime import datetime
 
 from pydantic import UUID4, BaseModel
@@ -29,3 +30,9 @@ class EventUpdateRequest(BaseModel):
     start_time: datetime | None = None
     end_time: datetime | None = None
     location: str | None = None
+
+
+class ParticipantStatus(enum.Enum):
+    REGISTERED = "registered"
+    ATTENDED = "attended"
+    CANCELED = "canceled"
