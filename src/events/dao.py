@@ -27,3 +27,10 @@ class EventParticipantDAO(BaseDAO):
             await session.refresh(participant)
 
         return participant
+
+    @classmethod
+    async def get_participants_by_event(cls, session: AsyncSession, event_id: uuid.UUID):
+        query = select(cls.model).filter_by(event_id=event_id)
+        result = await session.execute(query)
+        participants = result.scalars().all()
+        return participants

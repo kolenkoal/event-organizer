@@ -10,6 +10,7 @@ from src.events.schemas import (
     EventCreateRequest,
     EventParticipantCreate,
     EventParticipantResponse,
+    EventParticipantsResponse,
     EventResponse,
     EventUpdateRequest,
 )
@@ -83,9 +84,7 @@ async def delete_event(event_id: UUID4, session: Annotated[AsyncSession, Depends
 
 @router.patch("/{event_id}/cancel", status_code=status.HTTP_204_NO_CONTENT)
 async def cancel_participation(
-    event_id: UUID4,
-    user_id: UUID4,
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+    event_id: UUID4, user_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
 ):
     event = await EventDAO.find_by_id(session=session, model_id=event_id)
     if not event:
@@ -93,3 +92,20 @@ async def cancel_participation(
 
     await EventParticipantDAO.cancel_participation(session=session, user_id=user_id, event_id=event_id)
     return None
+
+
+@router.get("/{event_id}/participants", response_model=EventParticipantsResponse)
+async def get_event_participants(event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    participants = await EventParticipantDAO.get_participants_by_event(session=session, event_id=event_id)
+
+    return EventParticipantsResponse(
+        event_id=event_id,
+        participants=[
+            {"user_id": participant.user_id, "registration_date": participant.created_at, "status": participant.status}
+            for participant in participants
+        ],
+    )

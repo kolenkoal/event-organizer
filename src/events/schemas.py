@@ -51,3 +51,18 @@ class EventParticipantResponse(BaseModel):
     created_at: datetime
 
     model_config = SettingsConfigDict(from_attributes=True)
+
+
+class EventParticipantWithoutEventResponse(BaseModel):
+    user_id: UUID4
+    status: str
+    registration_date: datetime
+
+    model_config = SettingsConfigDict(from_attributes=True)
+
+
+class EventParticipantsResponse(BaseModel):
+    event_id: UUID4
+    participants: list[EventParticipantWithoutEventResponse]
+
+    model_config = SettingsConfigDict(from_attributes=True)
