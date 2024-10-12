@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.db_helper import db_helper
@@ -21,3 +22,15 @@ async def create_event(
     new_event = await EventDAO.create(session=session, **event_data.model_dump())
 
     return new_event
+
+
+@router.get("/{event_id}", response_model=EventResponse)
+async def get_event_by_id(
+        event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id) # TODO: filter by organizer
+
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    return event
