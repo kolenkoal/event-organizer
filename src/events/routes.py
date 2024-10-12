@@ -25,21 +25,18 @@ async def create_event(
 
 
 @router.get("/{event_id}", response_model=EventResponse)
-async def get_event_by_id(
-        event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
-):
-    event = await EventDAO.find_by_id(session=session, model_id=event_id) # TODO: filter by organizer
+async def get_event_by_id(event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
 
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
     return event
 
+
 @router.patch("/{event_id}", response_model=EventResponse)
 async def update_event(
-    event_id: UUID4,
-    event_data: EventUpdateRequest,
-    session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+    event_id: UUID4, event_data: EventUpdateRequest, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
 ):
     event = await EventDAO.find_by_id(session=session, model_id=event_id)
     if not event:
@@ -50,3 +47,12 @@ async def update_event(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to update event")
 
     return updated_event
+
+
+@router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_event(event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    await EventDAO.delete_certain_item(session=session, model_id=event_id)

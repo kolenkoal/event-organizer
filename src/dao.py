@@ -73,6 +73,10 @@ class BaseDAO:
 
     @classmethod
     async def delete_certain_item(cls, model_id, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+        event = await cls.find_by_id(session=session, model_id=model_id)
+        if not event:
+            return None
+
         delete_item_query = delete(cls.model).where(cls.model.id == model_id)
 
         await session.execute(delete_item_query)
