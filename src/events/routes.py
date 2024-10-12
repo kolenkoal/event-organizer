@@ -5,8 +5,15 @@ from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.db_helper import db_helper
-from src.events.dao import EventDAO
-from src.events.schemas import EventCreateRequest, EventResponse, EventUpdateRequest
+from src.events.dao import EventDAO, EventParticipantDAO
+from src.events.schemas import (
+    EventCreateRequest,
+    EventParticipantCreate,
+    EventParticipantResponse,
+    EventParticipantsResponse,
+    EventResponse,
+    EventUpdateRequest,
+)
 from src.users.dao import UserDAO
 
 router = APIRouter(prefix="/events", tags=["Events"])
@@ -22,6 +29,23 @@ async def create_event(
     new_event = await EventDAO.create(session=session, **event_data.model_dump())
 
     return new_event
+
+
+@router.post("/{event_id}/register", response_model=EventParticipantResponse)
+async def register_for_event(
+    event_id: UUID4, user_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    if not await UserDAO.find_by_id(session=session, model_id=user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    event_participant_data = EventParticipantCreate(user_id=user_id, event_id=event_id)
+    participant = await EventParticipantDAO.create(session=session, **event_participant_data.model_dump())
+
+    return participant
 
 
 @router.get("/{event_id}", response_model=EventResponse)
@@ -56,3 +80,32 @@ async def delete_event(event_id: UUID4, session: Annotated[AsyncSession, Depends
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
     await EventDAO.delete_certain_item(session=session, model_id=event_id)
+
+
+@router.patch("/{event_id}/cancel", status_code=status.HTTP_204_NO_CONTENT)
+async def cancel_participation(
+    event_id: UUID4, user_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    await EventParticipantDAO.cancel_participation(session=session, user_id=user_id, event_id=event_id)
+    return None
+
+
+@router.get("/{event_id}/participants", response_model=EventParticipantsResponse)
+async def get_event_participants(event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    participants = await EventParticipantDAO.get_participants_by_event(session=session, event_id=event_id)
+
+    return EventParticipantsResponse(
+        event_id=event_id,
+        participants=[
+            {"user_id": participant.user_id, "registration_date": participant.created_at, "status": participant.status}
+            for participant in participants
+        ],
+    )

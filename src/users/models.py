@@ -16,6 +16,8 @@ class User(Base, SQLAlchemyBaseUserTableUUID):  # type: ignore[misc]
 
     events: Mapped[list["Event"]] = relationship("Event", back_populates="organizer")  # noqa
 
+    participated_events = relationship("EventParticipant", back_populates="user")
+
     @classmethod
     def get_db(cls, session: AsyncSession) -> SQLAlchemyUserDatabase[UserProtocol[UUID], Self]:
         return SQLAlchemyUserDatabase(session, cls)

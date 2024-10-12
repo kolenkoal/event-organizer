@@ -1,7 +1,8 @@
+import datetime
 import uuid
 
 from fastapi_users.schemas import BaseUser, BaseUserCreate, BaseUserUpdate
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 
 class UserRead(BaseUser[uuid.UUID]):
@@ -17,3 +18,21 @@ class UserCreate(BaseUserCreate):
 class UserUpdate(BaseUserUpdate):
     first_name: str | None = Field(None, max_length=256)
     last_name: str | None = Field(None, max_length=256)
+
+
+class OrganizedEventResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+    start_time: datetime.datetime
+
+
+class ParticipatedEventResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+    start_time: datetime.datetime
+    status: str
+
+
+class UserEventsResponse(BaseModel):
+    organized_events: list[OrganizedEventResponse]
+    participated_events: list[ParticipatedEventResponse]
