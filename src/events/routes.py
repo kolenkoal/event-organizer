@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.db_helper import db_helper
 from src.events.dao import EventDAO
-from src.events.schemas import EventCreateRequest, EventResponse
+from src.events.schemas import EventCreateRequest, EventResponse, EventUpdateRequest
 from src.users.dao import UserDAO
 
 router = APIRouter(prefix="/events", tags=["Events"])
@@ -34,3 +34,19 @@ async def get_event_by_id(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
     return event
+
+@router.patch("/{event_id}", response_model=EventResponse)
+async def update_event(
+    event_id: UUID4,
+    event_data: EventUpdateRequest,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    updated_event = await EventDAO.update_data(session=session, model_id=event_id, data=event_data)
+    if not updated_event:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to update event")
+
+    return updated_event

@@ -63,6 +63,7 @@ class BaseDAO:
 
     @classmethod
     async def update_data(cls, model_id, data, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+        data = data.model_dump(exclude_unset=True)
         update_item_query = update(cls.model).where(cls.model.id == model_id).values(**data).returning(cls.model)
 
         updated_item = await session.execute(update_item_query)

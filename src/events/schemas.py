@@ -21,3 +21,11 @@ class EventResponse(BaseModel):
     location: str
     organizer_id: UUID4
     created_at: datetime
+
+
+class EventUpdateRequest(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    location: str | None = None
