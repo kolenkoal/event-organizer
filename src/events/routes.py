@@ -79,3 +79,17 @@ async def delete_event(event_id: UUID4, session: Annotated[AsyncSession, Depends
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
     await EventDAO.delete_certain_item(session=session, model_id=event_id)
+
+
+@router.patch("/{event_id}/cancel", status_code=status.HTTP_204_NO_CONTENT)
+async def cancel_participation(
+    event_id: UUID4,
+    user_id: UUID4,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    await EventParticipantDAO.cancel_participation(session=session, user_id=user_id, event_id=event_id)
+    return None
