@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.auth.models import AccessToken  # noqa
 from src.config.database import DatabaseSettings
+from src.events.models import Event  # noqa
 from src.models import Base
 from src.users.models import User  # noqa
 
