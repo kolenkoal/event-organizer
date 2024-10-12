@@ -21,6 +21,7 @@ class Event(Base):
         DateTime(timezone=True), default=datetime.datetime.now(datetime.timezone.utc), nullable=False
     )
 
+    participants = relationship("EventParticipant", back_populates="event")
     organizer = relationship("User", back_populates="events")
 
 

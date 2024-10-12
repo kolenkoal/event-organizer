@@ -5,8 +5,14 @@ from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.db_helper import db_helper
-from src.events.dao import EventDAO
-from src.events.schemas import EventCreateRequest, EventResponse, EventUpdateRequest
+from src.events.dao import EventDAO, EventParticipantDAO
+from src.events.schemas import (
+    EventCreateRequest,
+    EventParticipantCreate,
+    EventParticipantResponse,
+    EventResponse,
+    EventUpdateRequest,
+)
 from src.users.dao import UserDAO
 
 router = APIRouter(prefix="/events", tags=["Events"])
@@ -22,6 +28,23 @@ async def create_event(
     new_event = await EventDAO.create(session=session, **event_data.model_dump())
 
     return new_event
+
+
+@router.post("/{event_id}/register", response_model=EventParticipantResponse)
+async def register_for_event(
+    event_id: UUID4, user_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    if not await UserDAO.find_by_id(session=session, model_id=user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    event_participant_data = EventParticipantCreate(user_id=user_id, event_id=event_id)
+    participant = await EventParticipantDAO.create(session=session, **event_participant_data.model_dump())
+
+    return participant
 
 
 @router.get("/{event_id}", response_model=EventResponse)

@@ -2,6 +2,7 @@ import enum
 from datetime import datetime
 
 from pydantic import UUID4, BaseModel
+from pydantic_settings import SettingsConfigDict
 
 
 class EventCreateRequest(BaseModel):
@@ -36,3 +37,17 @@ class ParticipantStatus(enum.Enum):
     REGISTERED = "registered"
     ATTENDED = "attended"
     CANCELED = "canceled"
+
+
+class EventParticipantCreate(BaseModel):
+    event_id: UUID4
+    user_id: UUID4
+
+
+class EventParticipantResponse(BaseModel):
+    event_id: UUID4
+    user_id: UUID4
+    status: str
+    created_at: datetime
+
+    model_config = SettingsConfigDict(from_attributes=True)
