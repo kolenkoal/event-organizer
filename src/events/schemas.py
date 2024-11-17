@@ -11,7 +11,6 @@ class EventCreateRequest(BaseModel):
     start_time: datetime
     end_time: datetime
     location: str
-    organizer_id: UUID4
 
 
 class EventResponse(BaseModel):
