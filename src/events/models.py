@@ -21,8 +21,8 @@ class Event(Base):
         DateTime(timezone=True), default=datetime.datetime.now(datetime.timezone.utc), nullable=False
     )
 
-    participants = relationship("EventParticipant", back_populates="event")
-    organizer = relationship("User", back_populates="events")
+    participants = relationship("EventParticipant", back_populates="event", lazy="selectin")
+    organizer = relationship("User", back_populates="events", lazy="selectin")
 
 
 class EventParticipant(Base):
@@ -37,5 +37,5 @@ class EventParticipant(Base):
         DateTime(timezone=True), default=datetime.datetime.now(datetime.timezone.utc), nullable=False
     )
 
-    event = relationship("Event", back_populates="participants")
-    user = relationship("User", back_populates="participated_events")
+    event = relationship("Event", back_populates="participants", lazy="selectin")
+    user = relationship("User", back_populates="participated_events", lazy="selectin")
