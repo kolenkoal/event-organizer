@@ -12,9 +12,11 @@ async def main():
 
     await bot.set_my_commands(
         [
-            types.BotCommand(command="get_all_events", description="Информация обо всех доступных мероприятиях"),
-            types.BotCommand(command="get_all_my_events", description="Информация о мероприятиях, организованных мной"),
-            types.BotCommand(command="get_my_participations", description="Информация о мероприятиях, на которые я зарегистрировался (-ась)"),
+            types.BotCommand(command="get_all_events", description="Все доступные мероприятия"),
+            types.BotCommand(command="get_all_my_events", description="Мероприятия, организованных мной"),
+            types.BotCommand(
+                command="get_my_participations", description="Мероприятия, на которые я зарегистрировался (-ась)"
+            ),
         ]
     )
 
