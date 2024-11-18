@@ -36,3 +36,15 @@ class ParticipatedEventResponse(BaseModel):
 class UserEventsResponse(BaseModel):
     organized_events: list[OrganizedEventResponse]
     participated_events: list[ParticipatedEventResponse]
+
+
+class Event(BaseModel):
+    title: str
+    description: str
+    start_time: datetime.datetime
+    end_time: datetime.datetime
+    location: str
+
+
+class AllEventsResponse(BaseModel):
+    events: list[Event]
