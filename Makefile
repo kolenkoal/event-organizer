@@ -1,5 +1,5 @@
-CODE = src
-CODE_WITHOUT_TESTS = src
+CODE = src bot
+CODE_WITHOUT_TESTS = src bot
 PYTHON = 3.12
 
 .PHONY: init

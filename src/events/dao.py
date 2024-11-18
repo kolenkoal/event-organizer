@@ -1,6 +1,7 @@
+import datetime
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.dao import BaseDAO
@@ -10,6 +11,26 @@ from src.events.schemas import ParticipantStatus
 
 class EventDAO(BaseDAO):
     model = Event
+
+    @classmethod
+    async def find_all_current_events(cls, session: AsyncSession):
+        query = select(cls.model).where(cls.model.end_time > datetime.datetime.now()).order_by(cls.model.title)
+
+        result = await session.execute(query)
+
+        values = result.scalars().all()
+
+        return values
+
+    @classmethod
+    async def find_user_events_organize(cls, session: AsyncSession, user_id: uuid.UUID):
+        query = select(cls.model).where(cls.model.organizer_id == user_id, cls.model.end_time > datetime.datetime.now())
+
+        result = await session.execute(query)
+
+        values = result.scalars().all()
+
+        return values
 
 
 class EventParticipantDAO(BaseDAO):
@@ -34,3 +55,18 @@ class EventParticipantDAO(BaseDAO):
         result = await session.execute(query)
         participants = result.scalars().all()
         return participants
+
+    @classmethod
+    async def get_user_participated_events(cls, session: AsyncSession, user_id: uuid.UUID):
+        query = (
+            select(Event)
+            .join(cls.model, Event.id == EventParticipant.event_id)
+            .where(
+                cls.model.user_id == user_id,
+                Event.end_time > datetime.datetime.now(),
+                or_(cls.model.status == ParticipantStatus.REGISTERED, cls.model.status == ParticipantStatus.ATTENDED),
+            )
+        )
+        result = await session.execute(query)
+        events = result.scalars().all()
+        return events
