@@ -23,6 +23,9 @@ access_tokens: Dict[str, str] = {}
 
 
 def format_event_list(events: List[Dict], with_organizer: bool = False) -> str:
+    if not events:
+        return "События не найдены."
+
     formatted_message = "Список событий:\n\n"
     for i, event in enumerate(events, start=1):
         start_time = datetime.fromisoformat(event["start_time"].replace("Z", "+00:00"))
@@ -97,7 +100,12 @@ async def get_my_participations(message: types.Message):
         calendar = Calendar()
         event_file = f"{username}_events.ics"
         events = response.json()["events"]
+
         formatted_message = format_event_list(events)
+        await message.answer(formatted_message, parse_mode=ParseMode.MARKDOWN)
+
+        if not events:
+            return
 
         for event in events:
             add_event_to_calendar(calendar, event)
@@ -105,8 +113,6 @@ async def get_my_participations(message: types.Message):
         with open(event_file, "w") as my_file:
             my_file.writelines(calendar)
 
-        await message.answer(formatted_message, parse_mode=ParseMode.MARKDOWN)
-        await sleep(2)
         await message.answer_document(
             FSInputFile(event_file),
             caption="Также прислали вам файл с мероприятиями! Можете добавить их себе в календарь, чтобы ничего не забыть",
