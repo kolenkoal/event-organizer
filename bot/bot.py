@@ -1,7 +1,5 @@
 import os
-from asyncio import sleep
 from datetime import datetime
-from typing import Dict, List
 
 import httpx
 from aiogram import Dispatcher, types
@@ -19,10 +17,10 @@ START_MESSAGE = "Привет! Я бот для управления событ�
 
 dp = Dispatcher()
 
-access_tokens: Dict[str, str] = {}
+access_tokens: dict[str, str] = {}
 
 
-def format_event_list(events: List[Dict], with_organizer: bool = False) -> str:
+def format_event_list(events: list[dict], with_organizer: bool = False) -> str:
     if not events:
         return "События не найдены."
 
@@ -49,94 +47,112 @@ async def make_authorized_request(url: str, username: str, method: str = "GET", 
         return await getattr(client, method.lower())(url, headers=headers, **kwargs)
 
 
-def add_event_to_calendar(calendar: Calendar, event: Dict) -> None:
-    new_event = Event()
-    new_event.name = event["title"]
-    new_event.begin = event["start_time"]
-    new_event.end = event["end_time"]
-    new_event.location = event["location"]
-    new_event.description = event["description"]
-    calendar.events.add(new_event)
+def add_event_to_calendar(calendar: Calendar, event: dict[str, str]) -> None:
+    try:
+        new_event = Event()
+        new_event.name = event["title"]
+        new_event.begin = event["start_time"]
+        new_event.end = event["end_time"]
+        new_event.location = event["location"]
+        new_event.description = event["description"]
+        calendar.events.add(new_event)
+    except Exception:
+        pass
 
 
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
-    await get_or_create_user(message.chat)
-    await message.reply(START_MESSAGE)
+    try:
+        await get_or_create_user(message.chat)
+        await message.reply(START_MESSAGE)
+    except Exception:
+        pass
 
 
 @dp.message(Command("get_all_events"))
 async def get_all_events(message: types.Message):
-    async with httpx.AsyncClient() as client:
-        response = await client.get(f"{EVENTS_URL}/all")
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{EVENTS_URL}/all")
 
-        if response.status_code == 200:
-            events = response.json()["events"]
-            formatted_message = format_event_list(events)
-            await message.answer(formatted_message, parse_mode=ParseMode.MARKDOWN)
+            if response.status_code == 200:
+                events = response.json()["events"]
+                formatted_message = format_event_list(events)
+                await message.answer(formatted_message, parse_mode=ParseMode.MARKDOWN)
+    except Exception:
+        pass
 
 
 @dp.message(Command("get_all_my_events"))
 async def get_all_my_events(message: types.Message):
-    username = message.chat.username
-    if username not in access_tokens:
-        await get_or_create_user(message.chat)
+    try:
+        username = message.chat.username
+        if username not in access_tokens:
+            await get_or_create_user(message.chat)
 
-    response = await make_authorized_request(f"{EVENTS_URL}/my/organize", username)
-    if response.status_code == 200:
-        events = response.json()["events"]
-        formatted_message = format_event_list(events, with_organizer=True)
-        await message.answer(formatted_message, parse_mode=ParseMode.MARKDOWN)
+        response = await make_authorized_request(f"{EVENTS_URL}/my/organize", username)
+        if response.status_code == 200:
+            events = response.json()["events"]
+            formatted_message = format_event_list(events, with_organizer=True)
+            await message.answer(formatted_message, parse_mode=ParseMode.MARKDOWN)
+    except Exception:
+        pass
 
 
 @dp.message(Command("get_my_participations"))
 async def get_my_participations(message: types.Message):
-    username = message.chat.username
-    if username not in access_tokens:
-        await get_or_create_user(message.chat)
+    try:
+        username = message.chat.username
+        if username not in access_tokens:
+            await get_or_create_user(message.chat)
 
-    response = await make_authorized_request(f"{EVENTS_URL}/my/participate", username)
-    if response.status_code == 200:
-        calendar = Calendar()
-        event_file = f"{username}_events.ics"
-        events = response.json()["events"]
+        response = await make_authorized_request(f"{EVENTS_URL}/my/participate", username)
+        if response.status_code == 200:
+            calendar = Calendar()
+            event_file = f"{username}_events.ics"
+            events = response.json()["events"]
 
-        formatted_message = format_event_list(events)
-        await message.answer(formatted_message, parse_mode=ParseMode.MARKDOWN)
+            formatted_message = format_event_list(events)
+            await message.answer(formatted_message, parse_mode=ParseMode.MARKDOWN)
 
-        if not events:
-            return
+            if not events:
+                return
 
-        for event in events:
-            add_event_to_calendar(calendar, event)
+            for event in events:
+                add_event_to_calendar(calendar, event)
 
-        with open(event_file, "w") as my_file:
-            my_file.writelines(calendar)
+            with open(event_file, "w") as my_file:
+                my_file.writelines(calendar)
 
-        await message.answer_document(
-            FSInputFile(event_file),
-            caption="Также прислали вам файл с мероприятиями! Можете добавить их себе в календарь, чтобы ничего не забыть",
-        )
-        os.remove(event_file)
+            await message.answer_document(
+                FSInputFile(event_file),
+                caption="Также прислали вам файл с мероприятиями! Можете добавить их себе в календарь, чтобы ничего не забыть",
+            )
+            os.remove(event_file)
+    except Exception:
+        pass
 
 
 async def get_or_create_user(user_info: types.Chat):
-    async with httpx.AsyncClient() as client:
-        await client.post(
-            f"{AUTH_URL}/register",
-            json={
-                "email": f"{user_info.username}@mail.ru",
-                "password": "string",
-                "external_id": user_info.id,
-                "last_name": "string",
-                "first_name": "string",
-            },
-        )
-        response = await client.post(
-            f"{AUTH_URL}/login",
-            data={
-                "username": f"{user_info.username}@mail.ru",
-                "password": "string",
-            },
-        )
-        access_tokens[user_info.username] = response.json()["access_token"]
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                f"{AUTH_URL}/register",
+                json={
+                    "email": f"{user_info.username}@mail.ru",
+                    "password": "string",
+                    "external_id": user_info.id,
+                    "last_name": "string",
+                    "first_name": "string",
+                },
+            )
+            response = await client.post(
+                f"{AUTH_URL}/login",
+                data={
+                    "username": f"{user_info.username}@mail.ru",
+                    "password": "string",
+                },
+            )
+            access_tokens[user_info.username] = response.json()["access_token"]
+    except Exception:
+        pass
