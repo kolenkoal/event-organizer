@@ -39,6 +39,7 @@ class UserEventsResponse(BaseModel):
 
 
 class Event(BaseModel):
+    id: uuid.UUID
     title: str
     description: str
     start_time: datetime.datetime

@@ -27,6 +27,7 @@ async def get_current_events(session: Annotated[AsyncSession, Depends(db_helper.
     find_all_current_events = await EventDAO.find_all_current_events(session)
     events = [
         Event(
+            id=event.id,
             title=event.title,
             description=event.description,
             start_time=event.start_time,
@@ -45,6 +46,7 @@ async def get_current_participate_events(
     participated_events = await EventParticipantDAO.get_user_participated_events(session, user.id)
     events = [
         Event(
+            id=event.id,
             title=event.title,
             description=event.description,
             start_time=event.start_time,
@@ -63,6 +65,7 @@ async def get_my_current_organize_events(
     find_all_current_events = await EventDAO.find_user_events_organize(session, user.id)
     events = [
         Event(
+            id=event.id,
             title=event.title,
             description=event.description,
             start_time=event.start_time,

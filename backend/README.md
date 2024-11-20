@@ -232,3 +232,9 @@
 ```python
 python -c "import secrets; print(secrets.token_hex())"
 ```
+
+Запуск
+    ```
+    docker compose up -d
+    alembic upgrade head
+    ```
