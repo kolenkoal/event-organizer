@@ -4,7 +4,7 @@ import NavBar from "./components/Navbar";
 import { observer } from "mobx-react-lite";
 import { useContext, useEffect, useState } from "react";
 import { Context } from "./index";
-import { check, login } from "./http/userApi";
+import { check } from "./http/userApi";
 import { Spinner } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
