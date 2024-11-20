@@ -2,13 +2,16 @@ import Auth from "./pages/Auth";
 import Events from "./pages/Events";
 import Test from "./pages/Test";
 import EventPage from "./pages/EventPage";
+import Profile from "./pages/Profile";
 import {
     EVENTS_ROUTE,
     LOGIN_ROUTE,
     REGISTRATION_ROUTE,
     TEST_ROUTE,
     EVENT_ROUTE,
+    PROFILE_ROUTE,
 } from "./utils/consts";
+import { Component } from "react";
 
 export const authRoutes = [];
 
@@ -32,5 +35,9 @@ export const publicRoutes = [
     {
         path: EVENT_ROUTE + "/:id",
         Component: <EventPage />,
+    },
+    {
+        path: PROFILE_ROUTE,
+        Component: <Profile />,
     },
 ];

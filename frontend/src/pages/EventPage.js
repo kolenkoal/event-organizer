@@ -1,74 +1,107 @@
 import React, { useEffect, useState } from "react";
-import { Container, Col, Image, Row, Button, Card } from "react-bootstrap";
+import {
+    Container,
+    Col,
+    Image,
+    Row,
+    Button,
+    Card,
+    Badge,
+} from "react-bootstrap";
 import { useParams } from "react-router";
-import { FetchOneEvent } from "../http/EventApi";
+import { FetchOneEvent, RegisterForEvent } from "../http/EventApi";
 
 const EventPage = () => {
     const [event, setEvent] = useState({ info: [] });
+    const [isRegistered, setRegistered] = useState(true);
     const { id } = useParams();
+
     useEffect(() => {
         FetchOneEvent(id).then((data) => setEvent(data));
-    });
-    return (
-        <Container>
-            <Row>
-                <Col md={4}>
-                    <Image
-                        width={300}
-                        height={300}
-                        src={"http://localhost:5000/" + event.img}
-                    />
-                </Col>
+    }, []);
 
-                <Col md={4}>
-                    <Row className="d-flex flex-column align-items-center">
-                        <h2>{event.name}</h2>
-                        <div
-                            className="d-flex align-items-center justify-content-center"
-                            style={{
-                                background: `no-repeat center center`,
-                                width: 240,
-                                height: 240,
-                                backgroundSize: "cover",
-                                fontSize: 64,
-                            }}
-                        >
-                            {event.rating}
+    const onRegister = () => {
+        RegisterForEvent(id).then((data) => alert("Вы зарегистрированы"));
+    };
+
+    return (
+        <div className="d-flex flex-column">
+            <Container fluid className="bg-primary text-white p-4">
+                <h1 className="text-center">{event.title}</h1>
+            </Container>
+
+            <Container className="flex-grow-1 d-flex flex-column justify-content-between py-4">
+                <Row className="text-center my-3">
+                    <Col>
+                        <h5>Дата начала</h5>
+                        <p className="text-muted">
+                            {new Date(event.start_time).toLocaleDateString(
+                                "ru-Ru",
+                                {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }
+                            )}
+                        </p>
+                    </Col>
+                    <Col>
+                        <h5>Дата окончания</h5>
+                        <p className="text-muted">
+                            {new Date(event.end_time).toLocaleDateString(
+                                "ru-Ru",
+                                {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }
+                            )}
+                        </p>
+                    </Col>
+                </Row>
+
+                <Row className="my-3">
+                    <Col>
+                        <div className="p-4 border rounded bg-light shadow">
+                            <h4 className="text-center mb-3">
+                                Описание мероприятия
+                            </h4>
+                            <p style={{ fontSize: "1.2rem" }}>
+                                {event.description}
+                            </p>
                         </div>
-                    </Row>
-                </Col>
-                <Col md={4}>
-                    <Card
-                        className="d-flex flex-column align-items-center justify-content-around"
-                        style={{
-                            width: 300,
-                            height: 300,
-                            fontsize: 32,
-                            border: "5px solid lightgray",
-                        }}
-                    >
-                        <h3>От: {event.price}</h3>
-                        <Button variant={"outline-dark"}>
-                            Добавить в корзину
-                        </Button>
-                    </Card>
-                </Col>
-            </Row>
-            <Row className="d-flex flex-column m-3">
-                <h1>Характеристики</h1>
-                {event.info.map((info, index) => (
-                    <Row
-                        key={info.id}
-                        style={{
-                            background:
-                                index % 2 === 0 ? "lightgray" : "transparent",
-                        }}
-                    >
-                        {info.title}: {info.description}
-                    </Row>
-                ))}
-            </Row>
-        </Container>
+                    </Col>
+                </Row>
+
+                <Row className="mt-4 text-center">
+                    <Col>
+                        {isRegistered ? (
+                            <Button
+                                variant="success"
+                                size="lg"
+                                className="shadow"
+                                onClick={onRegister}
+                            >
+                                Зарегистрироваться
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="danger"
+                                size="lg"
+                                className="shadow"
+                                onClick={onRegister}
+                            >
+                                Ливнуть
+                            </Button>
+                        )}
+                    </Col>
+                </Row>
+            </Container>
+        </div>
     );
 };
 

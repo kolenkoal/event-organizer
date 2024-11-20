@@ -37,9 +37,16 @@ export const check = async () => {
     try {
         const { data } = await $authHost.get("api/v1/users/me");
         console.log("check", data);
-        if (!data) return false;
+        if (!data)
+            return {
+                isFound: false,
+                userData: [],
+            };
 
-        return true;
+        return {
+            isFound: true,
+            userData: data,
+        };
     } catch (e) {
         console.log(e.message);
     }

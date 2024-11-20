@@ -9,7 +9,7 @@ const EventItem = ({ event }) => {
         <Card
             className="mb-3 p-2"
             border="light"
-            onClick={() => navigate(EVENT_ROUTE + "/" + event.location)}
+            onClick={() => navigate(EVENT_ROUTE + "/" + event.id)}
         >
             <Row className="align-items-center">
                 <Col md={4}>

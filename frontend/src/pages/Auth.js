@@ -4,9 +4,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, REGISTRATION_ROUTE, EVENTS_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { login, registration } from "../http/userApi";
-
 import { Context } from "../index";
-import Menu from "../components/Menu";
 
 const Auth = observer(() => {
     const { user } = useContext(Context);

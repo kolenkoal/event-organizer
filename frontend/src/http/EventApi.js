@@ -23,3 +23,18 @@ export const FetchOneEvent = async (id) => {
     const { data } = await $host.get("api/v1/events/" + id);
     return data;
 };
+
+export const RegisterForEvent = async (id) => {
+    const { data } = await $authHost.post(
+        "api/v1/events/" + id + "/register",
+        id
+    );
+
+    return data;
+};
+
+export const FetchCurrentEvents = async () => {
+    const { data } = await $authHost.get("api/v1/events/my/participate");
+
+    return data;
+};
