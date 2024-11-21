@@ -1,31 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { AddEvent, FetchEvent } from "../../http/EventApi";
+import { AddEvent, FetchEvent, PatchEvent } from "../../http/EventApi";
 import { Context } from "../..";
 import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 
-const CreateEvent = observer(({ show, onHide }) => {
-    const { user, event } = useContext(Context);
+const CreateEvent = observer(({ show, onHide, event }) => {
+    const { user } = useContext(Context);
     const [title, setTitle] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [description, setDescription] = useState("");
     const [location, setLocation] = useState("");
 
+    const formatDateForInput = (date) => {
+        if (!date) return "";
+        const localDate = new Date(date);
+        const utcOffset = localDate.getTimezoneOffset();
+        localDate.setMinutes(localDate.getMinutes() - utcOffset);
+
+        return localDate.toISOString().slice(0, 16);
+    };
+
+    useEffect(() => {
+        if (event) {
+            setTitle(event.title);
+            setStartDate(formatDateForInput(event.start_time));
+            setEndDate(formatDateForInput(event.end_time));
+            setDescription(event.description);
+            setLocation(event.location);
+        }
+    }, [event]);
+
     const addEvent = () => {
         const parsedStartDatetime = new Date(startDate);
         const parsedEndDatetime = new Date(endDate);
         const eventData = {
-            "title": title,
-            "description": description,
+            title,
+            description,
             "start_time": parsedStartDatetime.toISOString(),
             "end_time": parsedEndDatetime.toISOString(),
-            "location": location,
+            location,
         };
-        AddEvent(eventData, user.token).then((data) => {
-            onHide();
-        });
+        if (event) {
+            PatchEvent(eventData, event.id, user.token).then((data) =>
+                onHide()
+            );
+        } else {
+            AddEvent(eventData, user.token).then((data) => {
+                onHide();
+            });
+        }
     };
 
     return (
@@ -84,7 +109,7 @@ const CreateEvent = observer(({ show, onHide }) => {
                     Закрыть
                 </Button>
                 <Button variant="outline-success" onClick={addEvent}>
-                    Добавить
+                    {event ? "Обновить" : "Добавить"}
                 </Button>
             </Modal.Footer>
         </Modal>

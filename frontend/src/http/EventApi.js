@@ -38,3 +38,27 @@ export const FetchCurrentEvents = async () => {
 
     return data;
 };
+
+export const FetchCreatedEvents = async () => {
+    const { data } = await $authHost.get("api/v1/events/my/organize");
+
+    return data;
+};
+
+export const PatchEvent = async (eventData, id, token) => {
+    const { data } = await $authHost.patch("api/v1/events/" + id, eventData, {
+        headers: {
+            "accept": "application/json",
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+    });
+
+    return data;
+};
+
+export const DeleteEvent = async (id) => {
+    const { data } = await $authHost.delete("api/v1/events/" + id);
+
+    return data;
+};
