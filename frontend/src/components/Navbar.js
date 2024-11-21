@@ -40,15 +40,6 @@ const NavBar = observer(() => {
                                 show={eventVisible}
                                 onHide={() => setEventVisible(false)}
                             />
-                            {/* <Button
-                                variant="outline-light"
-                                onClick={() => {
-                                    logOut();
-                                }}
-                                style={{ marginLeft: "4px" }}
-                            >
-                                Выйти
-                            </Button>  */}
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant="outline-light"
@@ -57,7 +48,11 @@ const NavBar = observer(() => {
                                 >
                                     <i className="bi bi-menu-button-wide"></i>
                                 </Dropdown.Toggle>
-                                <Dropdown.Menu>
+                                <Dropdown.Menu
+                                    style={{
+                                        marginLeft: "-45px",
+                                    }}
+                                >
                                     <Dropdown.ItemText
                                         style={{
                                             fontWeight: "bold",

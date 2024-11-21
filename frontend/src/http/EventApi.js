@@ -40,9 +40,13 @@ export const FetchCurrentEvents = async () => {
 };
 
 export const FetchCreatedEvents = async () => {
-    const { data } = await $authHost.get("api/v1/events/my/organize");
+    try {
+        const { data } = await $authHost.get("api/v1/events/my/organize");
 
-    return data;
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 export const PatchEvent = async (eventData, id, token) => {
@@ -59,6 +63,27 @@ export const PatchEvent = async (eventData, id, token) => {
 
 export const DeleteEvent = async (id) => {
     const { data } = await $authHost.delete("api/v1/events/" + id);
+
+    return data;
+};
+
+export const UnregisterFromEvent = async (userId, eventId, token) => {
+    const { data } = await $authHost.patch(
+        "api/v1/events/" + eventId + "/cancel" + `?user_id=${userId}`,
+        {
+            headers: {
+                "accept": "*/*",
+            },
+        }
+    );
+
+    return data;
+};
+
+export const FetchEventParticipants = async (id) => {
+    const { data } = await $authHost.get(
+        "/api/v1/events/" + id + "/participants"
+    );
 
     return data;
 };

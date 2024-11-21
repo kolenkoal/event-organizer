@@ -89,9 +89,11 @@ const CreateEvent = observer(({ show, onHide, event }) => {
                     <Form.Group className="mb-3">
                         <Form.Label>Описание</Form.Label>
                         <Form.Control
+                            as="textarea"
+                            rows={5}
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Введите имя создателя"
+                            placeholder="Введите описание"
                         />
                     </Form.Group>
                     <Form.Group className="mb-3">

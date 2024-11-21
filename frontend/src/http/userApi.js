@@ -1,5 +1,4 @@
 import { $authHost, $host } from "./index";
-import { jwtDecode } from "jwt-decode";
 
 export const registration = async (email, password) => {
     const { data } = await $host.post("api/v1/auth/register", {
@@ -36,7 +35,6 @@ export const login = async (email, password) => {
 export const check = async () => {
     try {
         const { data } = await $authHost.get("api/v1/users/me");
-        console.log("check", data);
         if (!data)
             return {
                 isFound: false,

@@ -9,7 +9,11 @@ const EventList = observer(() => {
     const { event } = useContext(Context);
     console.log(event.events);
     return (
-        <Container>
+        <Container
+            style={{
+                marginTop: "10px",
+            }}
+        >
             {event.events.map((event) => (
                 <EventItem key={event.id} event={event} />
             ))}

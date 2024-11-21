@@ -25,6 +25,9 @@ const App = observer(() => {
                     user.setToken("");
                 }
             })
+            .catch((error) => {
+                console.log(error);
+            })
             .finally(() => setLoading(false));
     }, []);
 

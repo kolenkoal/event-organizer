@@ -10,7 +10,7 @@ const EventItem = ({ event }) => {
     return (
         <>
             <Card
-                className="mb-3 p-2"
+                className="mb-3 p-2 border rounded bg-light shadow"
                 border="light"
                 onClick={() => navigate(EVENT_ROUTE + "/" + event.id)}
             >
@@ -20,10 +20,30 @@ const EventItem = ({ event }) => {
                     </Col>
                     <Col md={3}>
                         <div>
-                            <strong>Start:</strong> {event.start_time}
+                            <strong>Start:</strong>{" "}
+                            {new Date(event.start_time).toLocaleDateString(
+                                "ru-Ru",
+                                {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }
+                            )}
                         </div>
                         <div>
-                            <strong>End:</strong> {event.end_time}
+                            <strong>End:</strong>{" "}
+                            {new Date(event.end_time).toLocaleDateString(
+                                "ru-Ru",
+                                {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }
+                            )}
                         </div>
                     </Col>
                     <Col md={3}>
