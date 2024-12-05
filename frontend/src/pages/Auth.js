@@ -5,6 +5,7 @@ import { LOGIN_ROUTE, REGISTRATION_ROUTE, EVENTS_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { login, registration } from "../http/userApi";
 import { Context } from "../index";
+import ToastAlert from "../components/ToastAlert";
 
 const Auth = observer(() => {
     const { user } = useContext(Context);
@@ -13,6 +14,7 @@ const Auth = observer(() => {
     const isLogin = location.pathname === LOGIN_ROUTE;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isSuccess, setSuccess] = useState(false);
 
     const click = async () => {
         try {
@@ -26,8 +28,8 @@ const Auth = observer(() => {
             } else {
                 data = await registration(email, password);
                 if (data) {
-                    console.log(data);
-                    alert("User has been created");
+                    setSuccess(true);
+                    alert("Вы зарегистрировались !");
                     navigate(LOGIN_ROUTE);
                 }
             }
@@ -41,6 +43,7 @@ const Auth = observer(() => {
             className="d-flex justify-content-center align-items-center"
             style={{ height: window.innerHeight - 54 }}
         >
+            {/* {isSuccess && <ToastAlert message={"Вы зарегистрировались !"} />} */}
             <Card style={{ width: 600 }} className="p-5">
                 <h2 className="m-auto">
                     {isLogin ? "Авторизация" : "Регистрация"}

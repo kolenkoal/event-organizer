@@ -23,9 +23,12 @@ const NavBar = observer(() => {
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
-                    <NavLink style={{ color: "white" }} to={EVENTS_ROUTE}>
-                        Мероприятич
-                    </NavLink>
+                    <Button
+                        variant="dark"
+                        onClick={() => navigate(EVENTS_ROUTE)}
+                    >
+                        Мероприятия
+                    </Button>
                     {user.isAuth ? (
                         <Nav
                             className="ml-auto"

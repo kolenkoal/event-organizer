@@ -4,23 +4,21 @@ import { Route, Routes, Navigate } from "react-router";
 import { EVENTS_ROUTE, LOGIN_ROUTE } from "../utils/consts";
 import { Context } from "../index";
 
-
 const AppRouter = () => {
-    const {user} = useContext(Context)
+    const { user } = useContext(Context);
 
-    console.log(user)
     return (
-      <Routes>
-        {user.isAuth &&
-          authRoutes.map(({ path, Component }) => (
-            <Route key={path} path={path} element={Component} exact />
-          ))}
-        {publicRoutes.map(({path, Component}) => 
-            <Route key={path} path={path} element={Component} exact />
-          )}
-        <Route path='*' element={<Navigate to={EVENTS_ROUTE} replace />} />
-      </Routes>
+        <Routes>
+            {user.isAuth &&
+                authRoutes.map(({ path, Component }) => (
+                    <Route key={path} path={path} element={Component} exact />
+                ))}
+            {publicRoutes.map(({ path, Component }) => (
+                <Route key={path} path={path} element={Component} exact />
+            ))}
+            <Route path="*" element={<Navigate to={EVENTS_ROUTE} replace />} />
+        </Routes>
     );
-}
+};
 
-export default AppRouter
+export default AppRouter;

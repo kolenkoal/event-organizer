@@ -7,7 +7,6 @@ import { observer } from "mobx-react-lite";
 
 const EventList = observer(() => {
     const { event } = useContext(Context);
-    console.log(event.events);
     return (
         <Container
             style={{

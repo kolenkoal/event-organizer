@@ -1,42 +1,66 @@
 import { $authHost, $host } from "./index";
 import { useContext } from "react";
 import { Context } from "..";
+import { handleRequestError } from "./handleError";
 
 export const AddEvent = async (eventData, token) => {
-    const { data } = await $authHost.post("api/v1/events", eventData, {
-        headers: {
-            "accept": "application/json",
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
-    });
-    return data;
+    try {
+        const { data } = await $authHost.post("api/v1/events", eventData, {
+            headers: {
+                "accept": "application/json",
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+        // throw error;
+    }
 };
 
 export const FetchEvents = async () => {
-    const { data } = await $host.get("api/v1/events/all");
-    console.log(data);
-    return data;
+    try {
+        const { data } = await $host.get("api/v1/events/all");
+        console.log(data);
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+        // throw error;
+    }
 };
 
 export const FetchOneEvent = async (id) => {
-    const { data } = await $host.get("api/v1/events/" + id);
-    return data;
+    try {
+        const { data } = await $host.get("api/v1/events/" + id);
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+        // throw error;
+    }
 };
 
 export const RegisterForEvent = async (id) => {
-    const { data } = await $authHost.post(
-        "api/v1/events/" + id + "/register",
-        id
-    );
-
-    return data;
+    try {
+        const { data } = await $authHost.post(
+            "api/v1/events/" + id + "/register",
+            id
+        );
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+        // throw error;
+    }
 };
 
 export const FetchCurrentEvents = async () => {
-    const { data } = await $authHost.get("api/v1/events/my/participate");
+    try {
+        const { data } = await $authHost.get("api/v1/events/my/participate");
 
-    return data;
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+    }
 };
 
 export const FetchCreatedEvents = async () => {
@@ -45,45 +69,70 @@ export const FetchCreatedEvents = async () => {
 
         return data;
     } catch (error) {
-        console.log(error);
+        handleRequestError(error);
+        // throw error;
     }
 };
 
 export const PatchEvent = async (eventData, id, token) => {
-    const { data } = await $authHost.patch("api/v1/events/" + id, eventData, {
-        headers: {
-            "accept": "application/json",
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
-    });
+    try {
+        const { data } = await $authHost.patch(
+            "api/v1/events/" + id,
+            eventData,
+            {
+                headers: {
+                    "accept": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
-    return data;
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+        // throw error;
+    }
 };
 
 export const DeleteEvent = async (id) => {
-    const { data } = await $authHost.delete("api/v1/events/" + id);
+    try {
+        const { data } = await $authHost.delete("api/v1/events/" + id);
 
-    return data;
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+        // throw error;
+    }
 };
 
 export const UnregisterFromEvent = async (userId, eventId, token) => {
-    const { data } = await $authHost.patch(
-        "api/v1/events/" + eventId + "/cancel" + `?user_id=${userId}`,
-        {
-            headers: {
-                "accept": "*/*",
-            },
-        }
-    );
+    try {
+        const { data } = await $authHost.patch(
+            "api/v1/events/" + eventId + "/cancel" + `?user_id=${userId}`,
+            {
+                headers: {
+                    "accept": "*/*",
+                },
+            }
+        );
 
-    return data;
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+        // throw error;
+    }
 };
 
 export const FetchEventParticipants = async (id) => {
-    const { data } = await $authHost.get(
-        "/api/v1/events/" + id + "/participants"
-    );
+    try {
+        const { data } = await $authHost.get(
+            "/api/v1/events/" + id + "/participants"
+        );
 
-    return data;
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+        // throw error;
+    }
 };

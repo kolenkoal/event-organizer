@@ -5,8 +5,8 @@ import { Context } from "../..";
 import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 
-const CreateEvent = observer(({ show, onHide, event }) => {
-    const { user } = useContext(Context);
+const CreateEvent = observer(({ show, onHide, event_ }) => {
+    const { user, event } = useContext(Context);
     const [title, setTitle] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -23,14 +23,14 @@ const CreateEvent = observer(({ show, onHide, event }) => {
     };
 
     useEffect(() => {
-        if (event) {
-            setTitle(event.title);
-            setStartDate(formatDateForInput(event.start_time));
-            setEndDate(formatDateForInput(event.end_time));
-            setDescription(event.description);
-            setLocation(event.location);
+        if (event_) {
+            setTitle(event_.title);
+            setStartDate(formatDateForInput(event_.start_time));
+            setEndDate(formatDateForInput(event_.end_time));
+            setDescription(event_.description);
+            setLocation(event_.location);
         }
-    }, [event]);
+    }, [event_]);
 
     const addEvent = () => {
         const parsedStartDatetime = new Date(startDate);
@@ -42,10 +42,13 @@ const CreateEvent = observer(({ show, onHide, event }) => {
             "end_time": parsedEndDatetime.toISOString(),
             location,
         };
-        if (event) {
-            PatchEvent(eventData, event.id, user.token).then((data) =>
-                onHide()
-            );
+        if (event_) {
+            PatchEvent(eventData, event.id, user.token).then((data) => {
+                // let newEvents = event.events;
+
+                // event.setEvents(newEvents.append(data));
+                onHide();
+            });
         } else {
             AddEvent(eventData, user.token).then((data) => {
                 onHide();
@@ -111,7 +114,7 @@ const CreateEvent = observer(({ show, onHide, event }) => {
                     Закрыть
                 </Button>
                 <Button variant="outline-success" onClick={addEvent}>
-                    {event ? "Обновить" : "Добавить"}
+                    {event_ ? "Обновить" : "Добавить"}
                 </Button>
             </Modal.Footer>
         </Modal>
