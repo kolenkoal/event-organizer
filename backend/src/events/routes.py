@@ -111,7 +111,7 @@ async def register_for_event(
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
-    current_event = await EventParticipantDAO.find_one_or_none(session=session, user_id=user.id, event_id=event.id) # todo првоерять статус cancelled, иначе 409
+    current_event = await EventParticipantDAO.find_one_or_none(session=session, user_id=user.id, event_id=event.id)
 
     if current_event:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You already registered!")
