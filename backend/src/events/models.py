@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
+from sqlalchemy import JSON, DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,6 +23,7 @@ class Event(Base):
 
     participants = relationship("EventParticipant", back_populates="event", lazy="selectin")
     organizer = relationship("User", back_populates="events", lazy="selectin")
+    features = relationship("EventFeature", back_populates="event", lazy="selectin")
 
 
 class EventParticipant(Base):
@@ -39,3 +40,20 @@ class EventParticipant(Base):
 
     event = relationship("Event", back_populates="participants", lazy="selectin")
     user = relationship("User", back_populates="participated_events", lazy="selectin")
+
+
+class EventFeature(Base):
+    __tablename__ = "event_features"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    event_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("events.id"), nullable=False)
+    feature_type: Mapped[str] = mapped_column(
+        String(length=128), nullable=False
+    )  # Например, "calendar", "participants_list"
+    value: Mapped[dict] = mapped_column(JSON, nullable=True)
+
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), default=datetime.datetime.now(datetime.timezone.utc), nullable=False
+    )
+
+    event = relationship("Event", back_populates="features", lazy="selectin")

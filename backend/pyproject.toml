@@ -31,7 +31,6 @@ authors = ["kolenkoal <kolenko.alexander0@gmail.com>"]
 description = ""
 name = "event-organizer"
 package-mode = false
-readme = "README.md"
 version = "0.1.0"
 
 [tool.poetry.dependencies]

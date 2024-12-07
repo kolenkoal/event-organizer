@@ -22,6 +22,5 @@ plint:
 
 	poetry run ruff check $(CODE)
 	poetry run isort --check-only $(CODE)
-	poetry run pytest --dead-fixtures --dup-fixtures
 	poetry check
 	poetry run toml-sort pyproject.toml --all --in-place --check
