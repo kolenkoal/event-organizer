@@ -7,4 +7,3 @@ class AuthenticationSettings(BaseSettings):
     verification_token_secret: str = "123"
 
     model_config = SettingsConfigDict(env_prefix="AUTHENTICATION_")
-
