@@ -22,7 +22,7 @@ export const AddEvent = async (eventData, token) => {
 export const FetchEvents = async () => {
     try {
         const { data } = await $host.get("api/v1/events/all");
-        console.log(data);
+        console.log("Fetch Events", data);
         return data;
     } catch (error) {
         handleRequestError(error);
