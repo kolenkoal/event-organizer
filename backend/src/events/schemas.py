@@ -1,4 +1,5 @@
 import enum
+import uuid
 from datetime import datetime
 
 from pydantic import UUID4, BaseModel
@@ -65,3 +66,27 @@ class EventParticipantsResponse(BaseModel):
     participants: list[EventParticipantWithoutEventResponse]
 
     model_config = SettingsConfigDict(from_attributes=True)
+
+
+class SubEventResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+    start_time: datetime
+    end_time: datetime
+    location: str | None = None
+
+    class Config:
+        orm_mode = True
+
+
+class EventWithSubEventsResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+    description: str | None = None
+    start_time: datetime
+    end_time: datetime
+    location: str | None = None
+    sub_events: list[SubEventResponse]
+
+    class Config:
+        orm_mode = True
