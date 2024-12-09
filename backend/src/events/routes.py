@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -15,6 +16,7 @@ from src.events.schemas import (
     EventParticipantsResponse,
     EventResponse,
     EventUpdateRequest,
+    EventWithSubEventsResponse,
 )
 from src.users.models import User
 from src.users.schemas import AllEventsResponse, Event
@@ -82,7 +84,12 @@ async def create_event(
     event_data: EventCreateRequest,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: User = Depends(current_user),
+    parent_event_id: uuid.UUID | None = None,
 ):
+    """
+    Создать основное мероприятие или подмероприятие.
+    Если передан `parent_event_id`, создаётся подмероприятие.
+    """
     now = datetime.datetime.now(datetime.timezone.utc)
 
     if event_data.end_time.tzinfo is None:
@@ -93,10 +100,31 @@ async def create_event(
 
     if event_data.end_time <= event_data.start_time:
         raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="End datetime should me more than start datetime"
+            status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="End datetime should be more than start datetime"
         )
 
-    new_event = await EventDAO.create(session=session, organizer_id=user.id, **event_data.model_dump())
+    if parent_event_id:
+        parent_event = await EventDAO.find_by_id(session=session, model_id=parent_event_id)
+        if not parent_event:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent event not found")
+
+        if not (parent_event.start_time <= event_data.start_time < parent_event.end_time):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Sub-event start time must be within the parent event time range",
+            )
+        if not (parent_event.start_time < event_data.end_time <= parent_event.end_time):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Sub-event end time must be within the parent event time range",
+            )
+
+    new_event = await EventDAO.create(
+        session=session,
+        organizer_id=user.id,
+        parent_event_id=parent_event_id,
+        **event_data.model_dump(),
+    )
 
     return new_event
 
@@ -130,9 +158,15 @@ async def register_for_event(
     return participant
 
 
-@router.get("/{event_id}", response_model=EventResponse)
-async def get_event_by_id(event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
-    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+@router.get("/{event_id}", response_model=EventWithSubEventsResponse)
+async def get_event_by_id(
+    event_id: UUID4,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+):
+    """
+    Получить мероприятие по ID вместе с его подмероприятиями.
+    """
+    event = await EventDAO.find_with_sub_events_by_id(session=session, model_id=event_id)
 
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")

@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.dao import BaseDAO
 from src.events.models import Event, EventParticipant
@@ -31,6 +32,13 @@ class EventDAO(BaseDAO):
         values = result.scalars().all()
 
         return values
+
+    @staticmethod
+    async def find_with_sub_events_by_id(session: AsyncSession, model_id: uuid.UUID):
+        query = select(Event).options(selectinload(Event.sub_events)).filter_by(id=model_id)
+
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
 
 
 class EventParticipantDAO(BaseDAO):
