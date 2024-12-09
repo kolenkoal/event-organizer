@@ -40,6 +40,15 @@ class EventDAO(BaseDAO):
         result = await session.execute(query)
         return result.scalar_one_or_none()
 
+    @staticmethod
+    async def delete_with_sub_events(session: AsyncSession, event: Event):
+        for sub_event in event.sub_events:
+            await session.delete(sub_event)
+
+        await session.delete(event)
+
+        await session.commit()
+
 
 class EventParticipantDAO(BaseDAO):
     model = EventParticipant
@@ -51,9 +60,8 @@ class EventParticipantDAO(BaseDAO):
         participant = result.scalars().first()
 
         if participant:
-            participant.status = ParticipantStatus.CANCELED
+            await session.delete(participant)
             await session.commit()
-            await session.refresh(participant)
 
         return participant
 
