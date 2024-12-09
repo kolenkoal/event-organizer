@@ -201,10 +201,11 @@ async def delete_event(
     await EventDAO.delete_with_sub_events(session=session, event=event)
 
 
-
 @router.patch("/{event_id}/cancel", status_code=status.HTTP_204_NO_CONTENT)
 async def cancel_participation(
-    event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)], user: User = Depends(current_user),
+    event_id: UUID4,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user: User = Depends(current_user),
 ):
     event = await EventDAO.find_by_id(session=session, model_id=event_id)
     if not event:
