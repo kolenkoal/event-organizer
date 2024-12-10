@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from sqlalchemy import DateTime, ForeignKey, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,12 +19,12 @@ class Event(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.datetime.now(datetime.timezone.utc), nullable=False
     )
+    requires_participants: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     parent_event_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("events.id"), nullable=True
     )
 
     sub_events = relationship("Event", back_populates="parent_event", lazy="selectin")
-
     parent_event = relationship("Event", remote_side="Event.id", back_populates="sub_events", lazy="selectin")
 
     participants = relationship("EventParticipant", back_populates="event", lazy="selectin")
