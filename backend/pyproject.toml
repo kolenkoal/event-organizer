@@ -92,6 +92,6 @@ skip-magic-trailing-comma = false
 [tool.ruff.lint]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 fixable = ["ALL"]
-ignore = []
+ignore = ["E711"]
 select = ["E4", "E7", "E9", "ERA001", "F", "T20"]
 unfixable = []

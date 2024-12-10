@@ -14,7 +14,12 @@ class EventDAO(BaseDAO):
 
     @classmethod
     async def find_all_current_events(cls, session: AsyncSession):
-        query = select(cls.model).where(cls.model.end_time > datetime.datetime.now()).order_by(cls.model.title)
+        query = (
+            select(cls.model)
+            .options(selectinload(cls.model.sub_events))
+            .where(cls.model.end_time > datetime.datetime.now(), cls.model.parent_event_id == None)
+            .order_by(cls.model.title)
+        )
 
         result = await session.execute(query)
 
@@ -24,7 +29,15 @@ class EventDAO(BaseDAO):
 
     @classmethod
     async def find_user_events_organize(cls, session: AsyncSession, user_id: uuid.UUID):
-        query = select(cls.model).where(cls.model.organizer_id == user_id, cls.model.end_time > datetime.datetime.now())
+        query = (
+            select(cls.model)
+            .options(selectinload(cls.model.sub_events))
+            .where(
+                cls.model.organizer_id == user_id,
+                cls.model.end_time > datetime.datetime.now(),
+                cls.model.parent_event_id == None,
+            )
+        )
 
         result = await session.execute(query)
 
@@ -75,8 +88,10 @@ class EventParticipantDAO(BaseDAO):
     async def get_user_participated_events(cls, session: AsyncSession, user_id: uuid.UUID):
         query = (
             select(Event)
+            .options(selectinload(Event.sub_events))
             .join(cls.model, Event.id == EventParticipant.event_id)
             .where(
+                Event.parent_event_id == None,
                 cls.model.user_id == user_id,
                 Event.end_time > datetime.datetime.now(),
             )
