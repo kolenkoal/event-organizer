@@ -226,7 +226,7 @@ async def get_event_participants(event_id: UUID4, session: Annotated[AsyncSessio
     return EventParticipantsResponse(
         event_id=event_id,
         participants=[
-            {"user_id": participant.user_id, "registration_date": participant.created_at, "status": participant.status}
+            {"user_id": participant.user_id, "registration_date": participant.created_at}
             for participant in participants
         ],
     )

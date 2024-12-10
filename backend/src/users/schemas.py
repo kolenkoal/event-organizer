@@ -30,7 +30,6 @@ class ParticipatedEventResponse(BaseModel):
     id: uuid.UUID
     title: str
     start_time: datetime.datetime
-    status: str
 
 
 class UserEventsResponse(BaseModel):

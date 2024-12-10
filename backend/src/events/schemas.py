@@ -1,4 +1,3 @@
-import enum
 import uuid
 from datetime import datetime
 
@@ -33,12 +32,6 @@ class EventUpdateRequest(BaseModel):
     location: str | None = None
 
 
-class ParticipantStatus(enum.Enum):
-    REGISTERED = "registered"
-    ATTENDED = "attended"
-    CANCELED = "canceled"
-
-
 class EventParticipantCreate(BaseModel):
     event_id: UUID4
     user_id: UUID4
@@ -47,7 +40,6 @@ class EventParticipantCreate(BaseModel):
 class EventParticipantResponse(BaseModel):
     event_id: UUID4
     user_id: UUID4
-    status: str
     created_at: datetime
 
     model_config = SettingsConfigDict(from_attributes=True)
@@ -55,7 +47,6 @@ class EventParticipantResponse(BaseModel):
 
 class EventParticipantWithoutEventResponse(BaseModel):
     user_id: UUID4
-    status: str
     registration_date: datetime
 
     model_config = SettingsConfigDict(from_attributes=True)

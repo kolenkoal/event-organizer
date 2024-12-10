@@ -1,11 +1,10 @@
 import datetime
 import uuid
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
+from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.events.schemas import ParticipantStatus
 from src.models import Base
 
 
@@ -35,10 +34,6 @@ class Event(Base):
 class EventParticipant(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
     event_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("events.id"), primary_key=True)
-
-    status: Mapped[ParticipantStatus] = mapped_column(
-        Enum(ParticipantStatus), nullable=False, default=ParticipantStatus.REGISTERED
-    )
 
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.datetime.now(datetime.timezone.utc), nullable=False

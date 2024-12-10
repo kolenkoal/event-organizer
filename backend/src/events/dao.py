@@ -1,13 +1,12 @@
 import datetime
 import uuid
 
-from sqlalchemy import or_, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.dao import BaseDAO
 from src.events.models import Event, EventParticipant
-from src.events.schemas import ParticipantStatus
 
 
 class EventDAO(BaseDAO):
@@ -80,7 +79,6 @@ class EventParticipantDAO(BaseDAO):
             .where(
                 cls.model.user_id == user_id,
                 Event.end_time > datetime.datetime.now(),
-                or_(cls.model.status == ParticipantStatus.REGISTERED, cls.model.status == ParticipantStatus.ATTENDED),
             )
         )
         result = await session.execute(query)

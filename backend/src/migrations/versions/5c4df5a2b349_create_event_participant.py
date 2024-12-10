@@ -23,7 +23,6 @@ def upgrade() -> None:
     op.create_table('event_participants',
     sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('event_id', sa.UUID(), nullable=False),
-    sa.Column('status', sa.Enum('REGISTERED', 'ATTENDED', 'CANCELED', name='participantstatus'), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['event_id'], ['events.id'], name=op.f('fk_event_participants_event_id_events')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_event_participants_user_id_users')),
