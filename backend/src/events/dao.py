@@ -99,3 +99,11 @@ class EventParticipantDAO(BaseDAO):
         result = await session.execute(query)
         events = result.scalars().all()
         return events
+
+    @staticmethod
+    async def find_by_user_and_event(
+        session: AsyncSession, user_id: uuid.UUID, event_id: uuid.UUID
+    ) -> EventParticipant | None:
+        query = select(EventParticipant).filter_by(user_id=user_id, event_id=event_id)
+        result = await session.execute(query)
+        return result.scalars().first()

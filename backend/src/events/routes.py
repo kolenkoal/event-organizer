@@ -17,6 +17,7 @@ from src.events.schemas import (
     EventResponse,
     EventUpdateRequest,
     EventWithSubEventsResponse,
+    ParticipantStatus,
 )
 from src.users.models import User
 from src.users.schemas import AllEventsResponse, Event, EventWithSubEvents
@@ -183,14 +184,16 @@ async def register_for_event(
     event_id: UUID4,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: User = Depends(current_user),
+    request: EventParticipantCreate = None,
 ):
     event = await EventDAO.find_by_id(session=session, model_id=event_id)
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
-    current_event = await EventParticipantDAO.find_one_or_none(session=session, user_id=user.id, event_id=event.id)
-
-    if current_event:
+    current_participation = await EventParticipantDAO.find_one_or_none(
+        session=session, user_id=user.id, event_id=event.id
+    )
+    if current_participation:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You already registered!")
 
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -201,9 +204,21 @@ async def register_for_event(
     if event.end_time <= now:
         raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="The Event has ended")
 
-    event_participant_data = EventParticipantCreate(user_id=user.id, event_id=event_id)
-    participant = await EventParticipantDAO.create(session=session, **event_participant_data.model_dump())
+    if event.requires_participants:
+        if not request or not request.artifacts:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Participation requires submitting artifacts.",
+            )
+        participation_data = EventParticipantCreate(
+            user_id=user.id, event_id=event_id, status=ParticipantStatus.PENDING, artifacts=request.artifacts
+        )
+    else:
+        participation_data = EventParticipantCreate(
+            user_id=user.id, event_id=event_id, status=ParticipantStatus.APPROVED
+        )
 
+    participant = await EventParticipantDAO.create(session=session, **participation_data.model_dump())
     return participant
 
 
