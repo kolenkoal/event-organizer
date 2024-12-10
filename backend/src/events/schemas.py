@@ -7,6 +7,10 @@ from pydantic import UUID4, BaseModel
 from pydantic_settings import SettingsConfigDict
 
 
+class ParticipantRole(str, enum.Enum):
+    LISTENER = "LISTENER"
+    PARTICIPANT = "PARTICIPANT"
+
 class EventCreateRequest(BaseModel):
     title: str
     description: str | None = None
@@ -38,7 +42,7 @@ class EventUpdateRequest(BaseModel):
 class EventParticipantCreate(BaseModel):
     event_id: UUID4 | None = None
     user_id: UUID4 | None = None
-    role: Literal["LISTENER", "PARTICIPANT"] = "LISTENER"
+    role: ParticipantRole
     artifacts: list[str] | None = None
 
     model_config = SettingsConfigDict(from_attributes=True)
@@ -80,9 +84,7 @@ class EventWithSubEventsResponse(BaseModel):
     model_config = SettingsConfigDict(from_attributes=True)
 
 
-class ParticipantRole(str, enum.Enum):
-    LISTENER = "LISTENER"
-    PARTICIPANT = "PARTICIPANT"
+
 
 
 class ParticipantStatus(str, enum.Enum):

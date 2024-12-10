@@ -17,6 +17,7 @@ from src.events.schemas import (
     EventResponse,
     EventUpdateRequest,
     EventWithSubEventsResponse,
+    ParticipantRole,
     ParticipantStatus,
 )
 from src.users.models import User
@@ -294,3 +295,74 @@ async def get_event_participants(event_id: UUID4, session: Annotated[AsyncSessio
             for participant in participants
         ],
     )
+
+
+@router.post("/{event_id}/request_participation", response_model=EventParticipantResponse)
+async def request_participation(
+        event_id: UUID4,
+        session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+        user: User = Depends(current_user),
+        role: ParticipantRole = ParticipantRole.PARTICIPANT,
+        artifacts: list[str] | None = None,
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    if event.requires_participants is False:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Event does not require participants")
+
+    current_event = await EventParticipantDAO.find_one_or_none(session=session, user_id=user.id, event_id=event.id)
+    if current_event:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You already requested participation")
+
+    event_participant_data = EventParticipantCreate(
+        user_id=user.id,
+        event_id=event_id,
+        role=role,
+        artifacts=artifacts
+    )
+
+    participant_request = await EventParticipantDAO.create(session=session, **event_participant_data.model_dump())
+    return participant_request
+
+
+@router.get("/{event_id}/participation_requests", response_model=list[EventParticipantResponse])
+async def get_participation_requests(
+    event_id: UUID4,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user: User = Depends(current_user),
+    status_filter: ParticipantStatus | None = None,
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    if event.organizer_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the organizer of this event")
+
+    participants = await EventParticipantDAO.get_participation_requests(session=session, event_id=event_id, status_filter=status_filter)
+    return participants
+
+
+@router.put("/{event_id}/participation_requests/{user_id}", response_model=EventParticipantResponse)
+async def handle_participation_request(
+    event_id: UUID4,
+    user_id: UUID4,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user: User = Depends(current_user),
+    participant_status: ParticipantStatus = ParticipantStatus.APPROVED,
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    if event.organizer_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the organizer of this event")
+
+    participant_request = await EventParticipantDAO.update_participation_status(session=session, event_id=event_id, user_id=user_id, status=participant_status)
+
+    if not participant_request:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Participation request not found")
+
+    return participant_request
