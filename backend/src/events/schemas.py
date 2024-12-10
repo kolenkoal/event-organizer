@@ -67,7 +67,7 @@ class SubEventResponse(BaseModel):
     location: str | None = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class EventWithSubEventsResponse(BaseModel):
@@ -80,4 +80,4 @@ class EventWithSubEventsResponse(BaseModel):
     sub_events: list[SubEventResponse]
 
     class Config:
-        orm_mode = True
+        from_attributes = True

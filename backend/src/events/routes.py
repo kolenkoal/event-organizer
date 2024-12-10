@@ -19,7 +19,7 @@ from src.events.schemas import (
     EventWithSubEventsResponse,
 )
 from src.users.models import User
-from src.users.schemas import AllEventsResponse, Event
+from src.users.schemas import AllEventsResponse, Event, EventWithSubEvents
 
 router = APIRouter(prefix="/events", tags=["Events"])
 
@@ -27,17 +27,34 @@ router = APIRouter(prefix="/events", tags=["Events"])
 @router.get("/all", response_model=AllEventsResponse)
 async def get_current_events(session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
     find_all_current_events = await EventDAO.find_all_current_events(session)
-    events = [
-        Event(
-            id=event.id,
-            title=event.title,
-            description=event.description,
-            start_time=event.start_time,
-            end_time=event.end_time,
-            location=event.location,
+    events = []
+
+    for event in find_all_current_events:
+        sub_events = []
+        for sub_event in event.sub_events:
+            sub_events.append(
+                Event(
+                    id=sub_event.id,
+                    title=sub_event.title,
+                    description=sub_event.description,
+                    start_time=sub_event.start_time,
+                    end_time=sub_event.end_time,
+                    location=sub_event.location,
+                )
+            )
+
+        events.append(
+            EventWithSubEvents(
+                id=event.id,
+                title=event.title,
+                description=event.description,
+                start_time=event.start_time,
+                end_time=event.end_time,
+                location=event.location,
+                sub_events=sub_events,
+            )
         )
-        for event in find_all_current_events
-    ]
+
     return AllEventsResponse(events=events)
 
 
@@ -46,17 +63,33 @@ async def get_current_participate_events(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)], user: User = Depends(current_user)
 ):
     participated_events = await EventParticipantDAO.get_user_participated_events(session, user.id)
-    events = [
-        Event(
-            id=event.id,
-            title=event.title,
-            description=event.description,
-            start_time=event.start_time,
-            end_time=event.end_time,
-            location=event.location,
+    events = []
+
+    for event in participated_events:
+        sub_events = []
+        for sub_event in event.sub_events:
+            sub_events.append(
+                Event(
+                    id=sub_event.id,
+                    title=sub_event.title,
+                    description=sub_event.description,
+                    start_time=sub_event.start_time,
+                    end_time=sub_event.end_time,
+                    location=sub_event.location,
+                )
+            )
+
+        events.append(
+            EventWithSubEvents(
+                id=event.id,
+                title=event.title,
+                description=event.description,
+                start_time=event.start_time,
+                end_time=event.end_time,
+                location=event.location,
+                sub_events=sub_events,
+            )
         )
-        for event in participated_events
-    ]
     return AllEventsResponse(events=events)
 
 
@@ -65,17 +98,33 @@ async def get_my_current_organize_events(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)], user: User = Depends(current_user)
 ):
     find_all_current_events = await EventDAO.find_user_events_organize(session, user.id)
-    events = [
-        Event(
-            id=event.id,
-            title=event.title,
-            description=event.description,
-            start_time=event.start_time,
-            end_time=event.end_time,
-            location=event.location,
+    events = []
+
+    for event in find_all_current_events:
+        sub_events = []
+        for sub_event in event.sub_events:
+            sub_events.append(
+                Event(
+                    id=sub_event.id,
+                    title=sub_event.title,
+                    description=sub_event.description,
+                    start_time=sub_event.start_time,
+                    end_time=sub_event.end_time,
+                    location=sub_event.location,
+                )
+            )
+
+        events.append(
+            EventWithSubEvents(
+                id=event.id,
+                title=event.title,
+                description=event.description,
+                start_time=event.start_time,
+                end_time=event.end_time,
+                location=event.location,
+                sub_events=sub_events,
+            )
         )
-        for event in find_all_current_events
-    ]
     return AllEventsResponse(events=events)
 
 

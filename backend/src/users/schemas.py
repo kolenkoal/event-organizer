@@ -46,5 +46,9 @@ class Event(BaseModel):
     location: str
 
 
+class EventWithSubEvents(Event):
+    sub_events: list[Event] = []
+
+
 class AllEventsResponse(BaseModel):
-    events: list[Event]
+    events: list[Event | EventWithSubEvents]
