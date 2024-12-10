@@ -13,11 +13,14 @@ import {
 import EventDetails from "../components/EventDetails";
 import { PROFILE_ROUTE } from "../utils/consts";
 import { Context } from "..";
+import { observer } from "mobx-react-lite";
 
-const EventPage = () => {
+const EventPage = observer(() => {
     const { user } = useContext(Context);
     const [event, setEvent] = useState({ info: [] });
     const [participants, setParticipants] = useState([]);
+    const [subEventId, setSubEventId] = useState("");
+    const [isRegisteredForSubEvent, setRegisteredForSubEvent] = useState(false);
     const [isCreator, setCreator] = useState(false);
     const [isRegistered, setRegistered] = useState(false);
     const navigate = useNavigate();
@@ -30,24 +33,51 @@ const EventPage = () => {
                 event.id === id ? setCreator(true) : console.log("false");
             })
         );
+
+        // !!!!!!!!!!!!! Нужно продумать логику, чтобы конкретные сабивенты подсвечивались, а другие нет
         FetchCurrentEvents().then((data) => {
             data.events.map((event) => {
-                event.id === id
-                    ? setRegistered(true)
-                    : console.log("Event page Current Events", "false");
+                if (subEventId) {
+                    setRegisteredForSubEvent(true);
+                } else {
+                    event.id === id
+                        ? setRegistered(true)
+                        : console.log("Event page Current Events", "false");
+                }
             });
         });
         FetchEventParticipants(id).then((data) => {
             setParticipants(data.participants);
         });
-    }, []);
+    }, [subEventId, id]);
+    console.log("subEventId", subEventId);
+    console.log("IsRegistered", isRegisteredForSubEvent);
+    const onRegister = (eventId) => {
+        if (!eventId) {
+            RegisterForEvent(id).then((data) => {
+                if (data) {
+                    setRegistered(true);
+                    setParticipants((prevParticipants) => [
+                        ...prevParticipants,
+                        { user_id: user._user.id },
+                    ]);
+                }
+            });
 
-    const onRegister = () => {
-        RegisterForEvent(id).then((data) => {
-            if (data && data.status === "registered") {
-                setRegistered(true);
+            return;
+        }
+
+        RegisterForEvent(eventId).then((data) => {
+            if (data) {
+                setRegisteredForSubEvent(true);
+                setParticipants((prevParticipants) => [
+                    ...prevParticipants,
+                    { user_id: user._user.id },
+                ]);
             }
         });
+
+        setSubEventId(eventId);
     };
 
     const onDeleteItem = () => {
@@ -57,23 +87,36 @@ const EventPage = () => {
         });
     };
 
-    const onUnregister = () => {
-        console.log(
-            "userID",
-            user._user.id,
-            "userToken",
-            user.token,
-            "EventId",
-            id
-        );
-        UnregisterFromEvent(user._user.id, id, user.token).then((data) => {
-            setRegistered(false);
+    const onUnregister = (eventId) => {
+        if (!eventId) {
+            UnregisterFromEvent(user._user.id, id).then((data) => {
+                setRegistered(false);
+                setParticipants((prevParticipants) => {
+                    return prevParticipants.filter(
+                        (participant) => participant.user_id !== user._user.id
+                    );
+                });
+            });
+
+            return;
+        }
+
+        UnregisterFromEvent(user._user.id, eventId).then((data) => {
+            setRegisteredForSubEvent(false);
+            setParticipants((prevParticipants) => {
+                return prevParticipants.filter(
+                    (participant) => participant.user_id !== user._user.id
+                );
+            });
         });
+
+        setSubEventId(eventId);
     };
 
     return (
         <EventDetails
             event={event}
+            isRegisteredForSubEvent={isRegisteredForSubEvent}
             onRegister={onRegister}
             isCreator={isCreator}
             isRegistered={isRegistered}
@@ -82,6 +125,6 @@ const EventPage = () => {
             participants={participants}
         />
     );
-};
+});
 
 export default EventPage;

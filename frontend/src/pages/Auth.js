@@ -21,10 +21,12 @@ const Auth = observer(() => {
             let data;
             if (isLogin) {
                 data = await login(email, password);
-                user.setUser(user);
-                user.setIsAuth(true);
-                user.setToken(data);
-                navigate(EVENTS_ROUTE);
+                if (data) {
+                    user.setUser(user);
+                    user.setIsAuth(true);
+                    user.setToken(data);
+                    navigate(EVENTS_ROUTE);
+                }
             } else {
                 data = await registration(email, password);
                 if (data) {

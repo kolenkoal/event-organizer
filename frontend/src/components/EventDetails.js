@@ -12,6 +12,7 @@ import {
     ListGroup,
 } from "react-bootstrap";
 import CreateEvent from "./modals/CreateEvent";
+import SubEvents from "./SubEvents";
 
 const EventDetails = ({
     event,
@@ -21,9 +22,11 @@ const EventDetails = ({
     isRegistered,
     onUnregister,
     participants,
+    isRegisteredForSubEvent,
 }) => {
     const [isEventVisible, setEventVisible] = useState(false);
     const [isParticipantsVisible, setParticipantsVisible] = useState(false);
+
     return (
         <div className="d-flex flex-column">
             <Container fluid className="bg-primary text-white p-4">
@@ -137,6 +140,25 @@ const EventDetails = ({
                         </div>
                     </Col>
                 </Row>
+
+                {event.sub_events && (
+                    <Row className="mt-4">
+                        <Col>
+                            <SubEvents
+                                subevents={event.sub_events}
+                                onDeleteItem={onDeleteItem}
+                                onUnregister={onUnregister}
+                                onRegister={onRegister}
+                                isCreator={isCreator}
+                                parentEventId={event.id}
+                                // isRegistered={isRegistered}
+                                isRegisteredForSubEvent={
+                                    isRegisteredForSubEvent
+                                }
+                            />
+                        </Col>
+                    </Row>
+                )}
 
                 <Row className="mt-4 text-center"></Row>
                 <Row className="mt-4">

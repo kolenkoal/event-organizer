@@ -30,7 +30,7 @@ const Profile = () => {
     //         location: "Санкт-Петербург",
     //     },
     // ];
-
+    console.log("created events", createdEvents);
     const [selectedList, setSelectedList] = useState("participating");
 
     const getButtonText = () => {

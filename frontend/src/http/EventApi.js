@@ -19,6 +19,26 @@ export const AddEvent = async (eventData, token) => {
     }
 };
 
+export const AddSubEvent = async (eventData, token, parentEventId) => {
+    try {
+        const { data } = await $authHost.post(
+            `api/v1/events?parent_event_id=${parentEventId}`,
+            eventData,
+            {
+                headers: {
+                    "accept": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+    }
+};
+
 export const FetchEvents = async () => {
     try {
         const { data } = await $host.get("api/v1/events/all");
@@ -33,6 +53,7 @@ export const FetchEvents = async () => {
 export const FetchOneEvent = async (id) => {
     try {
         const { data } = await $host.get("api/v1/events/" + id);
+        console.log("Fetch one event", data);
         return data;
     } catch (error) {
         handleRequestError(error);
@@ -106,7 +127,7 @@ export const DeleteEvent = async (id) => {
     }
 };
 
-export const UnregisterFromEvent = async (userId, eventId, token) => {
+export const UnregisterFromEvent = async (userId, eventId) => {
     try {
         const { data } = await $authHost.patch(
             "api/v1/events/" + eventId + "/cancel" + `?user_id=${userId}`,
