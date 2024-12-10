@@ -7,10 +7,11 @@ from pydantic_settings import SettingsConfigDict
 
 class EventCreateRequest(BaseModel):
     title: str
-    description: str
+    description: str | None = None
     start_time: datetime
     end_time: datetime
-    location: str
+    location: str | None = None
+    requires_participants: bool = False
 
 
 class EventResponse(BaseModel):
