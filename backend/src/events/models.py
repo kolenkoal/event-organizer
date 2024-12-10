@@ -1,10 +1,11 @@
 import datetime
 import uuid
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
+from sqlalchemy import ARRAY, Boolean, DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.events.schemas import ParticipantRole
 from src.models import Base
 
 
@@ -34,10 +35,13 @@ class Event(Base):
 class EventParticipant(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
     event_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("events.id"), primary_key=True)
-
+    role: Mapped[ParticipantRole] = mapped_column(
+        Enum(ParticipantRole), nullable=False, default=ParticipantRole.LISTENER
+    )
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.datetime.now(datetime.timezone.utc), nullable=False
     )
+    artifacts: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
 
     event = relationship("Event", back_populates="participants", lazy="selectin")
     user = relationship("User", back_populates="participated_events", lazy="selectin")

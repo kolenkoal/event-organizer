@@ -1,5 +1,7 @@
+import enum
 import uuid
 from datetime import datetime
+from typing import Literal
 
 from pydantic import UUID4, BaseModel
 from pydantic_settings import SettingsConfigDict
@@ -34,14 +36,10 @@ class EventUpdateRequest(BaseModel):
 
 
 class EventParticipantCreate(BaseModel):
-    event_id: UUID4
-    user_id: UUID4
-
-
-class EventParticipantResponse(BaseModel):
-    event_id: UUID4
-    user_id: UUID4
-    created_at: datetime
+    event_id: UUID4 | None = None
+    user_id: UUID4 | None = None
+    role: Literal["LISTENER", "PARTICIPANT"] = "LISTENER"
+    artifacts: list[str] | None = None
 
     model_config = SettingsConfigDict(from_attributes=True)
 
@@ -67,8 +65,7 @@ class SubEventResponse(BaseModel):
     end_time: datetime
     location: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = SettingsConfigDict(from_attributes=True)
 
 
 class EventWithSubEventsResponse(BaseModel):
@@ -80,5 +77,26 @@ class EventWithSubEventsResponse(BaseModel):
     location: str | None = None
     sub_events: list[SubEventResponse]
 
-    class Config:
-        from_attributes = True
+    model_config = SettingsConfigDict(from_attributes=True)
+
+
+class ParticipantRole(str, enum.Enum):
+    LISTENER = "LISTENER"
+    PARTICIPANT = "PARTICIPANT"
+
+
+class ParticipantStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    CANCELED = "CANCELED"
+
+
+class EventParticipantResponse(BaseModel):
+    event_id: UUID4
+    user_id: UUID4
+    role: ParticipantRole
+    created_at: datetime
+    artifacts: list[str] | None = None
+
+    model_config = SettingsConfigDict(from_attributes=True)
