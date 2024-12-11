@@ -11,6 +11,7 @@ const SubEvents = ({
     onDeleteItem,
     parentEventId,
     isRegisteredForSubEvent,
+    setRegisteredForSubEvent,
 }) => {
     const [isSubEventsVisible, setSubEventsVisible] = useState(false);
     const [isSubEventModalVisible, setSubEventModalVisible] = useState(false);
@@ -41,6 +42,7 @@ const SubEvents = ({
                         onDeleteItem={onDeleteItem}
                         onUnregister={onUnregister}
                         isRegisteredForSubEvent={isRegisteredForSubEvent}
+                        setRegisteredForSubEvent={setRegisteredForSubEvent}
                     />
                     {isCreator && (
                         <>

@@ -10,6 +10,7 @@ const SubEventList = ({
     registeredEvents,
     isCreator,
     isRegisteredForSubEvent,
+    setRegisteredForSubEvent,
 }) => {
     return (
         <ListGroup
@@ -35,6 +36,7 @@ const SubEventList = ({
                             isRegisteredForSubEvent={isRegisteredForSubEvent}
                             onRegister={onRegister}
                             onUnregister={onUnregister}
+                            setRegisteredForSubEvent={setRegisteredForSubEvent}
                         />
                     </ListGroup.Item>
                 ))

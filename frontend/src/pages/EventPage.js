@@ -25,6 +25,10 @@ const EventPage = observer(() => {
     const [isRegistered, setRegistered] = useState(false);
     const navigate = useNavigate();
     const { id } = useParams();
+    const info = {
+        role: "LISTENER",
+        artifacts: ["string"],
+    };
 
     useEffect(() => {
         FetchOneEvent(id).then((data) => setEvent(data));
@@ -37,24 +41,19 @@ const EventPage = observer(() => {
         // !!!!!!!!!!!!! Нужно продумать логику, чтобы конкретные сабивенты подсвечивались, а другие нет
         FetchCurrentEvents().then((data) => {
             data.events.map((event) => {
-                if (subEventId) {
-                    setRegisteredForSubEvent(true);
-                } else {
-                    event.id === id
-                        ? setRegistered(true)
-                        : console.log("Event page Current Events", "false");
-                }
+                event.id === id
+                    ? setRegistered(true)
+                    : console.log("Event page Current Events", "false");
             });
         });
         FetchEventParticipants(id).then((data) => {
             setParticipants(data.participants);
         });
     }, [subEventId, id]);
-    console.log("subEventId", subEventId);
-    console.log("IsRegistered", isRegisteredForSubEvent);
+
     const onRegister = (eventId) => {
         if (!eventId) {
-            RegisterForEvent(id).then((data) => {
+            RegisterForEvent(id, info).then((data) => {
                 if (data) {
                     setRegistered(true);
                     setParticipants((prevParticipants) => [
@@ -67,9 +66,9 @@ const EventPage = observer(() => {
             return;
         }
 
-        RegisterForEvent(eventId).then((data) => {
+        RegisterForEvent(eventId, info).then((data) => {
             if (data) {
-                setRegisteredForSubEvent(true);
+                // setRegisteredForSubEvent(true);
                 setParticipants((prevParticipants) => [
                     ...prevParticipants,
                     { user_id: user._user.id },
@@ -78,6 +77,7 @@ const EventPage = observer(() => {
         });
 
         setSubEventId(eventId);
+        return true;
     };
 
     const onDeleteItem = () => {
@@ -102,7 +102,7 @@ const EventPage = observer(() => {
         }
 
         UnregisterFromEvent(user._user.id, eventId).then((data) => {
-            setRegisteredForSubEvent(false);
+            // setRegisteredForSubEvent(false);
             setParticipants((prevParticipants) => {
                 return prevParticipants.filter(
                     (participant) => participant.user_id !== user._user.id
@@ -111,11 +111,13 @@ const EventPage = observer(() => {
         });
 
         setSubEventId(eventId);
+        return true;
     };
 
     return (
         <EventDetails
             event={event}
+            userId={user._user.id}
             isRegisteredForSubEvent={isRegisteredForSubEvent}
             onRegister={onRegister}
             isCreator={isCreator}
@@ -123,6 +125,7 @@ const EventPage = observer(() => {
             onDeleteItem={onDeleteItem}
             onUnregister={onUnregister}
             participants={participants}
+            setRegisteredForSubEvent={setRegisteredForSubEvent}
         />
     );
 });

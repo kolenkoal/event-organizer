@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Row, Col } from "react-bootstrap";
+import { FetchEventParticipants, RegisterForEvent } from "../http/EventApi";
+import { Context } from "..";
 
 const InfoSubEvent = ({
     event,
-    isRegisteredForSubEvent,
-    onRegister,
     onUnregister,
     isCreator,
+    onRegister,
+    // isRegisteredForSubEvent,
+    // isRegisteredForSubEvent,
 }) => {
+    const { user } = useContext(Context);
     const formatDate = (date) =>
         new Date(date).toLocaleDateString("ru-RU", {
             year: "numeric",
@@ -16,7 +20,32 @@ const InfoSubEvent = ({
             hour: "2-digit",
             minute: "2-digit",
         });
-    console.log("SubEventIsreg", isRegisteredForSubEvent);
+    const [count, setCount] = useState(0);
+    const info = {
+        role: "LISTENER",
+        artifacts: ["string"],
+    };
+    const [isRegisteredForSubEvent, setRegisteredForSubEvent] = useState(false);
+
+    useEffect(() => {
+        FetchEventParticipants(event.id).then((data) => {
+            if (data) {
+                data.participants.forEach((element) => {
+                    if (element.user_id === user._user.id) {
+                        setRegisteredForSubEvent(true);
+                    }
+                });
+            }
+
+            setCount(data.participants.length);
+        });
+    }, []);
+
+    // const onRegister = () => {
+    //     RegisterForEvent(event.id, info).then((data) => {
+
+    //     })
+    // }
     return (
         <Row
             className="align-items-center text-center justify-evenly"
@@ -38,7 +67,7 @@ const InfoSubEvent = ({
                 {formatDate(event.end_time)}
             </Col>
             <Col className="text-muted text-truncate">{event.location}</Col>
-            <Col className="text-muted text-truncate">{10} участников</Col>
+            <Col className="text-muted text-truncate">{count} участников</Col>
             <Col xs="auto" className="text-end">
                 {isCreator ? (
                     <>
@@ -60,14 +89,26 @@ const InfoSubEvent = ({
                         {isRegisteredForSubEvent ? (
                             <button
                                 className="btn btn-danger btn-sm"
-                                onClick={() => onUnregister(event.id)}
+                                onClick={() => {
+                                    const flag = onUnregister(event.id);
+                                    if (flag) {
+                                        setRegisteredForSubEvent(false);
+                                    }
+                                    setCount(count - 1);
+                                }}
                             >
                                 Отписаться
                             </button>
                         ) : (
                             <button
                                 className="btn btn-success btn-sm"
-                                onClick={() => onRegister(event.id)}
+                                onClick={() => {
+                                    const flag = onRegister(event.id);
+                                    if (flag) {
+                                        setRegisteredForSubEvent(true);
+                                    }
+                                    setCount(count + 1);
+                                }}
                             >
                                 Записаться
                             </button>

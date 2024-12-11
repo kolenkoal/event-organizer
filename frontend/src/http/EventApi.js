@@ -61,11 +61,11 @@ export const FetchOneEvent = async (id) => {
     }
 };
 
-export const RegisterForEvent = async (id) => {
+export const RegisterForEvent = async (eventId, info) => {
     try {
         const { data } = await $authHost.post(
-            "api/v1/events/" + id + "/register",
-            id
+            "api/v1/events/" + eventId + "/register",
+            info
         );
         return data;
     } catch (error) {
