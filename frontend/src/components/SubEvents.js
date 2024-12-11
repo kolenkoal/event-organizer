@@ -12,6 +12,7 @@ const SubEvents = ({
     parentEventId,
     isRegisteredForSubEvent,
     setRegisteredForSubEvent,
+    userId,
 }) => {
     const [isSubEventsVisible, setSubEventsVisible] = useState(false);
     const [isSubEventModalVisible, setSubEventModalVisible] = useState(false);
@@ -43,6 +44,7 @@ const SubEvents = ({
                         onUnregister={onUnregister}
                         isRegisteredForSubEvent={isRegisteredForSubEvent}
                         setRegisteredForSubEvent={setRegisteredForSubEvent}
+                        userId={userId}
                     />
                     {isCreator && (
                         <>

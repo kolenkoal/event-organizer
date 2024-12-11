@@ -24,6 +24,7 @@ const EventDetails = ({
     participants,
     isRegisteredForSubEvent,
     setRegisteredForSubEvent,
+    userId,
 }) => {
     const [isEventVisible, setEventVisible] = useState(false);
     const [isParticipantsVisible, setParticipantsVisible] = useState(false);
@@ -159,6 +160,7 @@ const EventDetails = ({
                                 setRegisteredForSubEvent={
                                     setRegisteredForSubEvent
                                 }
+                                userId={userId}
                             />
                         </Col>
                     </Row>
