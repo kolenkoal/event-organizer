@@ -14,19 +14,19 @@ const App = observer(() => {
 
     useEffect(() => {
         check()
-            .then(({ isFound, userData }) => {
-                if (isFound) {
-                    user.setUser(userData);
-                    user.setIsAuth(isFound);
+            .then((data) => {
+                if (data.isFound) {
+                    user.setUser(data.userData);
+                    user.setIsAuth(data.isFound);
                     user.setToken(localStorage.getItem("token"));
                 } else {
                     user.setUser({});
-                    user.setIsAuth(isFound);
+                    user.setIsAuth(data.isFound);
                     user.setToken("");
                 }
             })
             .catch((error) => {
-                console.log(error);
+                // console.log(error);
             })
             .finally(() => setLoading(false));
     }, []);

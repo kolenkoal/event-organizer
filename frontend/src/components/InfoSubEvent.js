@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Row, Col } from "react-bootstrap";
-import { FetchEventParticipants, RegisterForEvent } from "../http/EventApi";
+import { Row, Col, Button } from "react-bootstrap";
+import { DeleteEvent, FetchEventParticipants, RegisterForEvent } from "../http/EventApi";
 import { Context } from "..";
+import CreateSubEvent from "./modals/CreateSubEvent";
 
 const InfoSubEvent = ({
     event,
     onUnregister,
     isCreator,
     onRegister,
+    onDeleteItem
     // isRegisteredForSubEvent,
     // isRegisteredForSubEvent,
 }) => {
@@ -26,7 +28,8 @@ const InfoSubEvent = ({
         artifacts: ["string"],
     };
     const [isRegisteredForSubEvent, setRegisteredForSubEvent] = useState(false);
-
+    const [isEventVisible, setEventVisible] = useState(false);
+    
     useEffect(() => {
         FetchEventParticipants(event.id).then((data) => {
             if (data) {
@@ -56,34 +59,41 @@ const InfoSubEvent = ({
                 gap: "5px",
             }}
         >
-            <Col className="text-truncate">
+            <Col className="text-wrap">
                 <strong>{event.title}</strong>
             </Col>
-            <Col className="text-muted text-truncate">{event.description}</Col>
-            <Col className="text-muted text-truncate">
+            <Col className="text-wrap text-truncate">{event.description}</Col>
+            <Col className="text-wrap text-truncate">
                 {formatDate(event.start_time)}
             </Col>
-            <Col className="text-muted text-truncate">
+            <Col className="text-wrap text-truncate">
                 {formatDate(event.end_time)}
             </Col>
-            <Col className="text-muted text-truncate">{event.location}</Col>
-            <Col className="text-muted text-truncate">{count} участников</Col>
+            <Col className="text-wrap text-truncate">{event.location}</Col>
+            <Col className="text-wrap ">{count} участников</Col>
             <Col xs="auto" className="text-end">
                 {isCreator ? (
-                    <>
-                        <button
-                            className="btn btn-danger btn-sm m-1"
-                            // onClick={() => onUnregister(event.id)}
+                    <div className='d-flex gap-1'>
+                        <Button
+                            // className="btn btn-danger btn-sm m-1"
+                            variant='outline-danger'
+                            onClick={() => setEventVisible(true)}
                         >
                             Редактировать
-                        </button>
-                        <button
-                            className="btn btn-danger btn-sm"
-                            // onClick={() => onRegister(event.id)}
+                        </Button>
+                        <CreateSubEvent 
+                            subevent={event}
+                            show={isEventVisible}
+                            onHide={() => setEventVisible(false)}
+                        />
+                        <Button
+                            // className="btn btn-danger btn-sm"
+                            variant='danger'
+                            onClick={() => onDeleteItem(event.id)}
                         >
                             <i className="bi bi-trash"></i>
-                        </button>
-                    </>
+                        </Button>
+                    </div>
                 ) : (
                     <>
                         {isRegisteredForSubEvent ? (

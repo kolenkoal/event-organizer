@@ -4,7 +4,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE, REGISTRATION_ROUTE, EVENTS_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { login, registration } from "../http/userApi";
-import { Context } from "../index";
+import { Context } from "..";
 import ToastAlert from "../components/ToastAlert";
 
 const Auth = observer(() => {
@@ -15,7 +15,7 @@ const Auth = observer(() => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isSuccess, setSuccess] = useState(false);
-
+    
     const click = async () => {
         try {
             let data;

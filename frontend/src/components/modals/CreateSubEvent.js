@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 
 const CreateSubEvent = observer(
-    ({ show, onHide, parentEventId, subevent_ }) => {
+    ({ show, onHide, parentEventId, subevent }) => {
         const { user } = useContext(Context);
         const [title, setTitle] = useState("");
         const [startDate, setStartDate] = useState("");
@@ -24,12 +24,12 @@ const CreateSubEvent = observer(
         };
 
         useEffect(() => {
-            if (subevent_) {
-                setTitle(subevent_.title);
-                setStartDate(formatDateForInput(subevent_.start_time));
-                setEndDate(formatDateForInput(subevent_.end_time));
-                setDescription(subevent_.description);
-                setLocation(subevent_.location);
+            if (subevent) {
+                setTitle(subevent.title);
+                setStartDate(formatDateForInput(subevent.start_time));
+                setEndDate(formatDateForInput(subevent.end_time));
+                setDescription(subevent.description);
+                setLocation(subevent.location);
             } else {
                 setTitle("");
                 setStartDate("");
@@ -37,7 +37,7 @@ const CreateSubEvent = observer(
                 setDescription("");
                 setLocation("");
             }
-        }, [subevent_]);
+        }, [subevent]);
 
         const handleSaveSubEvent = () => {
             const parsedStartDatetime = new Date(startDate);
@@ -52,9 +52,9 @@ const CreateSubEvent = observer(
                 "parent_event_id": parentEventId,
             };
 
-            if (subevent_) {
+            if (subevent) {
                 // Обновление существующего подмероприятия
-                PatchEvent(subEventData, subevent_.id, user.token).then(
+                PatchEvent(subEventData, subevent.id, user.token).then(
                     (data) => {
                         onHide();
                     }
@@ -74,7 +74,7 @@ const CreateSubEvent = observer(
             <Modal show={show} onHide={onHide} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        {subevent_
+                        {subevent
                             ? "Редактировать подмероприятие"
                             : "Добавить подмероприятие"}
                     </Modal.Title>
@@ -133,7 +133,7 @@ const CreateSubEvent = observer(
                         variant="outline-success"
                         onClick={handleSaveSubEvent}
                     >
-                        {subevent_ ? "Обновить" : "Добавить"}
+                        {subevent ? "Обновить" : "Добавить"}
                     </Button>
                 </Modal.Footer>
             </Modal>

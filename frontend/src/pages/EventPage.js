@@ -31,11 +31,14 @@ const EventPage = observer(() => {
     };
 
     useEffect(() => {
-        FetchOneEvent(id).then((data) => setEvent(data));
+        FetchOneEvent(id).then((data) => {
+            setEvent(data)
+        });
+        
         FetchCreatedEvents().then((data) =>
             data.events.map((event) => {
                 event.id === id ? setCreator(true) : console.log("false");
-            })
+        })
         );
 
         // !!!!!!!!!!!!! Нужно продумать логику, чтобы конкретные сабивенты подсвечивались, а другие нет
@@ -50,7 +53,6 @@ const EventPage = observer(() => {
             setParticipants(data.participants);
         });
     }, [subEventId, id]);
-
     const onRegister = (eventId) => {
         if (!eventId) {
             RegisterForEvent(id, info).then((data) => {

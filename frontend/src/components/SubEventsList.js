@@ -1,10 +1,11 @@
 import React from "react";
 import { ListGroup } from "react-bootstrap";
 import InfoSubEvent from "./InfoSubEvent";
+import { DeleteEvent } from "../http/EventApi";
 
 const SubEventList = ({
     subevents,
-    onDeleteItem,
+    // onDeleteItem,
     onRegister,
     onUnregister,
     registeredEvents,
@@ -12,6 +13,11 @@ const SubEventList = ({
     isRegisteredForSubEvent,
     setRegisteredForSubEvent,
 }) => {
+    const onDeleteItem = async (id) => {
+        DeleteEvent(id).then((data) => {
+                alert('Subevent has been deleted')
+        })
+    }
     return (
         <ListGroup
             style={{
@@ -33,6 +39,7 @@ const SubEventList = ({
                         <InfoSubEvent
                             isCreator={isCreator}
                             event={subevent}
+                            onDeleteItem={onDeleteItem}
                             isRegisteredForSubEvent={isRegisteredForSubEvent}
                             onRegister={onRegister}
                             onUnregister={onUnregister}

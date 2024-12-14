@@ -12,7 +12,6 @@ const Events = observer(() => {
             event.setEvents(data.events);
         });
     }, [event]);
-    console.log("All events", event);
     return (
         <>
             <EventList />

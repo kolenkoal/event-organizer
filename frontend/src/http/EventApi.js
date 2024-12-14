@@ -53,7 +53,6 @@ export const FetchEvents = async () => {
 export const FetchOneEvent = async (id) => {
     try {
         const { data } = await $host.get("api/v1/events/" + id);
-        console.log("Fetch one event", data);
         return data;
     } catch (error) {
         handleRequestError(error);

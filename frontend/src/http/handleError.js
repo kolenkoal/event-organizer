@@ -2,9 +2,8 @@ import axios from "axios";
 
 export const handleRequestError = (error) => {
     if (axios.isAxiosError(error)) {
-        console.error("Request Error:", error.response?.data || error.message);
-        // Можно добавить логику: вывод уведомлений, логирование и т.д.
+        alert(`${error.status} ${error.response.data.detail}`);
     } else {
-        console.error("Unexpected Error:", error);
+        alert("Unexpected Error:", error);
     }
 };

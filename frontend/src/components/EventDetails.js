@@ -2,12 +2,8 @@ import { useState } from "react";
 import {
     Container,
     Col,
-    Image,
     Row,
     Button,
-    Card,
-    Badge,
-    Accordion,
     Collapse,
     ListGroup,
 } from "react-bootstrap";
@@ -28,7 +24,7 @@ const EventDetails = ({
 }) => {
     const [isEventVisible, setEventVisible] = useState(false);
     const [isParticipantsVisible, setParticipantsVisible] = useState(false);
-
+    console.log('EventDetails', event)
     return (
         <div className="d-flex flex-column">
             <Container fluid className="bg-primary text-white p-4">
@@ -46,9 +42,9 @@ const EventDetails = ({
                                     Изменить
                                 </Button>
                                 <CreateEvent
+                                    subevents={event}
                                     show={isEventVisible}
                                     onHide={() => setEventVisible(false)}
-                                    event={event}
                                 />
                                 <Button
                                     variant="danger"
