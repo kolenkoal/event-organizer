@@ -1,12 +1,14 @@
 import datetime
 import uuid
 
+from pydantic import UUID4
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.dao import BaseDAO
 from src.events.models import Event, EventParticipant
+from src.events.schemas import ParticipantStatus
 
 
 class EventDAO(BaseDAO):
@@ -101,9 +103,42 @@ class EventParticipantDAO(BaseDAO):
         return events
 
     @staticmethod
-    async def find_by_user_and_event(
-        session: AsyncSession, user_id: uuid.UUID, event_id: uuid.UUID
-    ) -> EventParticipant | None:
-        query = select(EventParticipant).filter_by(user_id=user_id, event_id=event_id)
+    async def get_participation_requests(
+        session: AsyncSession, event_id: UUID4, status_filter: ParticipantStatus | None = None
+    ):
+        query = select(EventParticipant).filter(EventParticipant.event_id == event_id)
+
+        if status_filter:
+            query = query.filter(EventParticipant.status == status_filter)
+
         result = await session.execute(query)
-        return result.scalars().first()
+        participants = result.scalars().all()
+
+        return participants
+
+    @staticmethod
+    async def update_participation_status(
+        session: AsyncSession, event_id: UUID4, user_id: UUID4, status: ParticipantStatus
+    ):
+        participant_request = await session.execute(
+            select(EventParticipant).filter(EventParticipant.event_id == event_id, EventParticipant.user_id == user_id)
+        )
+        participant_request = participant_request.scalar_one_or_none()
+
+        if participant_request:
+            participant_request.status = status
+            await session.commit()
+            await session.refresh(participant_request)
+            return participant_request
+
+        return None
+
+    @staticmethod
+    async def get_user_events(session: AsyncSession, user_id: uuid.UUID):
+        query = (
+            select(EventParticipant)
+            .join(Event)
+            .filter(EventParticipant.user_id == user_id, Event.requires_participants == True)
+        )
+        result = await session.execute(query)
+        return result.scalars().all()
