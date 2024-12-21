@@ -5,7 +5,7 @@ from sqlalchemy import ARRAY, Boolean, DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.events.schemas import ParticipantRole
+from src.events.schemas import ParticipantRole, ParticipantStatus
 from src.models import Base
 
 
@@ -40,6 +40,9 @@ class EventParticipant(Base):
     )
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.datetime.now(datetime.timezone.utc), nullable=False
+    )
+    status: Mapped[ParticipantStatus] = mapped_column(
+        Enum(ParticipantStatus), nullable=False, default=ParticipantStatus.PENDING
     )
     artifacts: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
 
