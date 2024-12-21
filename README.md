@@ -238,3 +238,13 @@ python -c "import secrets; print(secrets.token_hex())"
     docker compose up -d
     alembic upgrade head
     ```
+
+Пояснения к Pull Requests 12-14
+12: Было добавлено поле requires_participants, которое задает необходимость иметь участников мероприятия.  
+
+13: Также мы создадим роль PARTICIPANT или LISTENER, модифицировав EventParticipant. Плюс добавим валдиацию для регистрации слушателей и участников:
+Если requires_participants у события False, разрешить только регистрацию слушателей. Если True, добавить возможность подачи заявки на участие.
+
+
+14: Создадим ParticipationRequest со статусом заявки на участие (PENDING, APPROVED, REJECTED, CANCELED) и статус у участия мероприятия
+Добавлены ручки "Отправить запрос на участие", "Получить заявки (для организатора).", "Обновить статус заявки (APPROVED, REJECTED)"
