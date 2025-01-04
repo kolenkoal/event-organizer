@@ -11,6 +11,13 @@ class ParticipantRole(str, enum.Enum):
     PARTICIPANT = "PARTICIPANT"
 
 
+class ParticipantStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    CANCELED = "CANCELED"
+
+
 class EventCreateRequest(BaseModel):
     title: str
     description: str | None = None
@@ -42,7 +49,8 @@ class EventUpdateRequest(BaseModel):
 class EventParticipantCreate(BaseModel):
     event_id: UUID4 | None = None
     user_id: UUID4 | None = None
-    role: ParticipantRole
+    status: ParticipantStatus = ParticipantStatus.PENDING
+    role: ParticipantRole = ParticipantRole.LISTENER
     artifacts: list[str] | None = None
 
     model_config = SettingsConfigDict(from_attributes=True)
@@ -82,13 +90,6 @@ class EventWithSubEventsResponse(BaseModel):
     sub_events: list[SubEventResponse]
 
     model_config = SettingsConfigDict(from_attributes=True)
-
-
-class ParticipantStatus(str, enum.Enum):
-    PENDING = "PENDING"
-    APPROVED = "APPROVED"
-    REJECTED = "REJECTED"
-    CANCELED = "CANCELED"
 
 
 class EventParticipantResponse(BaseModel):
