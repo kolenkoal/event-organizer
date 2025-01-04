@@ -2,7 +2,7 @@ import datetime
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,10 +20,19 @@ from src.events.schemas import (
     ParticipantRole,
     ParticipantStatus,
 )
+from src.s3.manager import s3_manager
 from src.users.models import User
 from src.users.schemas import AllEventsResponse, Event, EventWithSubEvents
 
 router = APIRouter(prefix="/events", tags=["Events"])
+
+
+ALLOWED_MIME_TYPES = {
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "application/pdf",
+}
 
 
 @router.get("/all", response_model=AllEventsResponse)
@@ -180,12 +189,46 @@ async def create_event(
     return new_event
 
 
+@router.patch("/{event_id}/logo", response_model=EventResponse)
+async def update_event_logo(
+    event_id: UUID4,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    logo: UploadFile = File(...),
+    user: User = Depends(current_user),
+):
+    """
+    Загрузить или обновить логотип мероприятия.
+    """
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    if event.organizer_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the organizer of this event")
+
+    if logo.content_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported file type for logo: {logo.content_type}. Allowed types: {', '.join(ALLOWED_MIME_TYPES)}",
+        )
+
+    logo_key = f"events/{event_id}/logo/{uuid.uuid4()}_{logo.filename}"
+    try:
+        logo_url = s3_manager.upload_file(logo, logo_key)
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload logo: {e}",
+        )
+
+    return await EventDAO.update_event_logo(event, logo_url, session)
+
+
 @router.post("/{event_id}/register", response_model=EventParticipantResponse)
 async def register_for_event(
     event_id: UUID4,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: User = Depends(current_user),
-    request: EventParticipantCreate = None,
 ):
     event = await EventDAO.find_by_id(session=session, model_id=event_id)
     if not event:
@@ -205,19 +248,7 @@ async def register_for_event(
     if event.end_time <= now:
         raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="The Event has ended")
 
-    if event.requires_participants:
-        if not request or not request.artifacts:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Participation requires submitting artifacts.",
-            )
-        participation_data = EventParticipantCreate(
-            user_id=user.id, event_id=event_id, status=ParticipantStatus.PENDING, artifacts=request.artifacts
-        )
-    else:
-        participation_data = EventParticipantCreate(
-            user_id=user.id, event_id=event_id, status=ParticipantStatus.APPROVED
-        )
+    participation_data = EventParticipantCreate(user_id=user.id, event_id=event_id, status=ParticipantStatus.APPROVED)
 
     participant = await EventParticipantDAO.create(session=session, **participation_data.model_dump())
     return participant
@@ -302,14 +333,13 @@ async def request_participation(
     event_id: UUID4,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: User = Depends(current_user),
-    role: ParticipantRole = ParticipantRole.PARTICIPANT,
-    artifacts: list[str] | None = None,
+    artifacts: list[UploadFile] | None = None,
 ):
     event = await EventDAO.find_by_id(session=session, model_id=event_id)
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
-    if event.requires_participants is False:
+    if not event.requires_participants:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Event does not require participants")
 
     if event.organizer_id == user.id:
@@ -319,10 +349,31 @@ async def request_participation(
     if current_event:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="You already requested participation")
 
-    event_participant_data = EventParticipantCreate(user_id=user.id, event_id=event_id, role=role, artifacts=artifacts)
+    artifact_urls = []
 
-    participant_request = await EventParticipantDAO.create(session=session, **event_participant_data.model_dump())
-    return participant_request
+    if artifacts:
+        for artifact in artifacts:
+            if artifact.content_type not in ALLOWED_MIME_TYPES:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Unsupported file type: {artifact.content_type}. Allowed types: {', '.join(ALLOWED_MIME_TYPES)}",
+                )
+
+            key = f"events/{event_id}/users/{user.id}/{artifact.filename}"
+            try:
+                file_url = s3_manager.upload_file(artifact, key)
+                artifact_urls.append(file_url)
+            except RuntimeError as e:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Failed to upload artifact: {e}",
+                )
+
+    event_participant_data = EventParticipantCreate(
+        user_id=user.id, event_id=event_id, role=ParticipantRole.PARTICIPANT, artifacts=artifact_urls
+    )
+
+    return await EventParticipantDAO.create(session=session, **event_participant_data.model_dump())
 
 
 @router.get("/{event_id}/participation_requests", response_model=list[EventParticipantResponse])

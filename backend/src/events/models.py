@@ -24,6 +24,7 @@ class Event(Base):
     parent_event_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("events.id"), nullable=True
     )
+    logo_url: Mapped[str] = mapped_column(String(length=1024), nullable=True)
 
     sub_events = relationship("Event", back_populates="parent_event", lazy="selectin")
     parent_event = relationship("Event", remote_side="Event.id", back_populates="sub_events", lazy="selectin")
