@@ -15,6 +15,13 @@ class EventDAO(BaseDAO):
     model = Event
 
     @classmethod
+    async def update_event_logo(cls, event: Event, logo_url: str, session: AsyncSession):
+        event.logo_url = logo_url
+        await session.commit()
+        await session.refresh(event)
+        return event
+
+    @classmethod
     async def find_all_current_events(cls, session: AsyncSession):
         query = (
             select(cls.model)

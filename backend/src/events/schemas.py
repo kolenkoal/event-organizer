@@ -36,6 +36,8 @@ class EventResponse(BaseModel):
     location: str
     organizer_id: UUID4
     created_at: datetime
+    parent_event_id: UUID4 | None = None
+    logo_url: str | None = None
 
 
 class EventUpdateRequest(BaseModel):

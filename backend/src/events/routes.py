@@ -2,7 +2,7 @@ import datetime
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -187,6 +187,41 @@ async def create_event(
     )
 
     return new_event
+
+
+@router.patch("/{event_id}/logo", response_model=EventResponse)
+async def update_event_logo(
+    event_id: UUID4,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    logo: UploadFile = File(...),
+    user: User = Depends(current_user),
+):
+    """
+    Загрузить или обновить логотип мероприятия.
+    """
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    if event.organizer_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the organizer of this event")
+
+    if logo.content_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported file type for logo: {logo.content_type}. Allowed types: {', '.join(ALLOWED_MIME_TYPES)}",
+        )
+
+    logo_key = f"events/{event_id}/logo/{uuid.uuid4()}_{logo.filename}"
+    try:
+        logo_url = s3_manager.upload_file(logo, logo_key)
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload logo: {e}",
+        )
+
+    return await EventDAO.update_event_logo(event, logo_url, session)
 
 
 @router.post("/{event_id}/register", response_model=EventParticipantResponse)
