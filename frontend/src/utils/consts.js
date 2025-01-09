@@ -4,3 +4,4 @@ export const REGISTRATION_ROUTE = "/registration";
 export const TEST_ROUTE = "/test";
 export const EVENT_ROUTE = "/event";
 export const PROFILE_ROUTE = "/profile";
+export const REQUESTS_ROUTE = "/requests";

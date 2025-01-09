@@ -156,3 +156,71 @@ export const FetchEventParticipants = async (id) => {
         // throw error;
     }
 };
+
+export const RequestParticipation = async (eventId, formData, token) => {
+    try {
+        const { data } = await $authHost.post(
+            `api/v1/events/${eventId}/request_participation`,
+            formData,
+            {
+                headers: {
+                    "accept": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+    }
+};
+
+export const FetchParticipationRequests = async (eventId) => {
+    try {
+        const { data } = await $authHost.get(
+            `api/v1/events/${eventId}/participation_requests`
+        );
+
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+    }
+};
+
+export const HandleParticipationRequest = async (eventId, userId, status) => {
+    try {
+        const { data } = await $authHost.put(
+            `api/v1/events/${eventId}/participation_requests/${userId}?participant_status=${status}`
+        );
+
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+    }
+};
+
+export const getUserParticipationRequests = async (eventId) => {
+    try {
+        const { data } = await $authHost.get(
+            `api/v1/events/${eventId}/my-participation-requests`
+        );
+
+        return data;
+    } catch (error) {
+        // handleRequestError(error);
+    }
+};
+
+export const getUserEvents = async () => {
+    try {
+        const { data } = await $authHost.get(
+            "api/v1/events/users/my/events-participation"
+        );
+
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+    }
+};

@@ -5,6 +5,8 @@ import { Context } from "../..";
 import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 
+// Добавить возможность сохранения результата при сохранении
+
 const CreateEvent = observer(({ show, onHide, event }) => {
     const { user } = useContext(Context);
     const [title, setTitle] = useState("");
@@ -12,6 +14,7 @@ const CreateEvent = observer(({ show, onHide, event }) => {
     const [endDate, setEndDate] = useState("");
     const [description, setDescription] = useState("");
     const [location, setLocation] = useState("");
+    const [isChecked, setIsChecked] = useState(false);
 
     const formatDateForInput = (date) => {
         if (!date) return "";
@@ -29,6 +32,12 @@ const CreateEvent = observer(({ show, onHide, event }) => {
             setEndDate(formatDateForInput(event.end_time));
             setDescription(event.description);
             setLocation(event.location);
+        } else {
+            setTitle("");
+            setStartDate("");
+            setEndDate("");
+            setDescription("");
+            setLocation("");
         }
     }, [event]);
 
@@ -41,6 +50,7 @@ const CreateEvent = observer(({ show, onHide, event }) => {
             "start_time": parsedStartDatetime.toISOString(),
             "end_time": parsedEndDatetime.toISOString(),
             location,
+            "requires_participants": isChecked,
         };
         if (event) {
             PatchEvent(eventData, event.id, user.token).then((data) => {
@@ -55,7 +65,7 @@ const CreateEvent = observer(({ show, onHide, event }) => {
             });
         }
     };
-
+    console.log("event details", event);
     return (
         <Modal show={show} onHide={onHide} size="lg" centered>
             <Modal.Header closeButton>
@@ -105,6 +115,16 @@ const CreateEvent = observer(({ show, onHide, event }) => {
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
                             placeholder="Введите локацию"
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Check
+                            type="switch"
+                            id="private-event-switch"
+                            label="Будут выступающие"
+                            checked={isChecked}
+                            onChange={() => setIsChecked(!isChecked)}
                         />
                     </Form.Group>
                 </Form>

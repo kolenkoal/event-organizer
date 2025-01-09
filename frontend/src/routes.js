@@ -10,8 +10,10 @@ import {
     TEST_ROUTE,
     EVENT_ROUTE,
     PROFILE_ROUTE,
+    REQUESTS_ROUTE,
 } from "./utils/consts";
 import { Component } from "react";
+import Requests from "./pages/Requests";
 
 export const authRoutes = [];
 
@@ -39,5 +41,9 @@ export const publicRoutes = [
     {
         path: PROFILE_ROUTE,
         Component: <Profile />,
+    },
+    {
+        path: REQUESTS_ROUTE,
+        Component: <Requests />,
     },
 ];

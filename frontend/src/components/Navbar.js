@@ -2,7 +2,12 @@ import React, { useContext, useState } from "react";
 import { Context } from "../index";
 import { Navbar, Nav, Button, Container, Dropdown } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import { EVENTS_ROUTE, LOGIN_ROUTE, PROFILE_ROUTE } from "../utils/consts";
+import {
+    EVENTS_ROUTE,
+    LOGIN_ROUTE,
+    PROFILE_ROUTE,
+    REQUESTS_ROUTE,
+} from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import CreateEvent from "./modals/CreateEvent";
@@ -18,7 +23,7 @@ const NavBar = observer(() => {
         localStorage.removeItem("token");
         navigate(LOGIN_ROUTE);
     };
-    console.log("NavBar", user);
+    // console.log("NavBar", user);
     return (
         <>
             <Navbar bg="dark" data-bs-theme="dark">
@@ -71,9 +76,9 @@ const NavBar = observer(() => {
                                         Профиль
                                     </Dropdown.Item>
                                     <Dropdown.Item
-                                        onClick={() => alert("Перешли куда-то")}
+                                        onClick={() => navigate(REQUESTS_ROUTE)}
                                     >
-                                        Куда-то
+                                        Заявки
                                     </Dropdown.Item>
                                     <Dropdown.Item
                                         onClick={() => alert("Перешли туда-то")}

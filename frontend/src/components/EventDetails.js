@@ -9,6 +9,8 @@ import {
 } from "react-bootstrap";
 import CreateEvent from "./modals/CreateEvent";
 import SubEvents from "./SubEvents";
+import CreateRequest from "./modals/CreateRequest";
+import RequestStatus from "./helper/RequestStatus";
 
 const EventDetails = ({
     event,
@@ -21,65 +23,88 @@ const EventDetails = ({
     isRegisteredForSubEvent,
     setRegisteredForSubEvent,
     userId,
+    requestStatus,
 }) => {
     const [isEventVisible, setEventVisible] = useState(false);
     const [isParticipantsVisible, setParticipantsVisible] = useState(false);
-    console.log('EventDetails', event)
+    const [isRequestVisible, setRequestVisible] = useState(false);
     return (
         <div className="d-flex flex-column">
             <Container fluid className="bg-primary text-white p-4">
                 <Col className="d-flex justify-content-around">
                     <h1 className="text-center">{event.title}</h1>
-                    <Row>
-                        {isCreator ? (
-                            <div className="d-flex">
-                                <Button
-                                    variant="danger"
-                                    size="lg"
-                                    className="shadow"
-                                    onClick={() => setEventVisible(true)}
-                                >
-                                    Изменить
-                                </Button>
-                                <CreateEvent
-                                    subevents={event}
-                                    show={isEventVisible}
-                                    onHide={() => setEventVisible(false)}
-                                />
-                                <Button
-                                    variant="danger"
-                                    size="lg"
-                                    style={{ marginLeft: "10px" }}
-                                    className="shadow"
-                                    onClick={() => onDeleteItem()}
-                                >
-                                    Удалить
-                                </Button>
-                            </div>
-                        ) : (
-                            <>
-                                {isRegistered ? (
+                    <RequestStatus requestStatus={requestStatus} />
+
+                    {requestStatus !== "REJECTED" && (
+                        <Row>
+                            {isCreator ? (
+                                <div className="d-flex">
                                     <Button
                                         variant="danger"
                                         size="lg"
                                         className="shadow"
-                                        onClick={() => onUnregister()}
+                                        onClick={() => setEventVisible(true)}
                                     >
-                                        Отписаться
+                                        Изменить
                                     </Button>
-                                ) : (
+                                    <CreateEvent
+                                        event={event}
+                                        show={isEventVisible}
+                                        onHide={() => setEventVisible(false)}
+                                    />
                                     <Button
-                                        variant="success"
+                                        variant="danger"
                                         size="lg"
-                                        className="shadow"
-                                        onClick={() => onRegister()}
+                                        className="shadow ms-2"
+                                        onClick={onDeleteItem}
                                     >
-                                        Зарегистрироваться
+                                        Удалить
                                     </Button>
-                                )}
-                            </>
-                        )}
-                    </Row>
+                                </div>
+                            ) : (
+                                <>
+                                    {isRegistered ? (
+                                        <Button
+                                            variant="danger"
+                                            size="lg"
+                                            className="shadow"
+                                            onClick={() => onUnregister()}
+                                        >
+                                            Отписаться
+                                        </Button>
+                                    ) : (
+                                        <div>
+                                            <Button
+                                                variant="success"
+                                                size="lg"
+                                                className="shadow w-100 mb-2"
+                                                onClick={() => onRegister()}
+                                            >
+                                                Зарегистрироваться
+                                            </Button>
+                                            <Button
+                                                variant="warning"
+                                                size="lg"
+                                                className="shadow w-100"
+                                                onClick={() =>
+                                                    setRequestVisible(true)
+                                                }
+                                            >
+                                                Подать заявку
+                                            </Button>
+                                            <CreateRequest
+                                                show={isRequestVisible}
+                                                onHide={() =>
+                                                    setRequestVisible(false)
+                                                }
+                                                eventId={event.id}
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </Row>
+                    )}
                 </Col>
             </Container>
 
@@ -88,8 +113,8 @@ const EventDetails = ({
                     <Col>
                         <h5>Дата начала</h5>
                         <p className="text-muted">
-                            {new Date(event.start_time).toLocaleDateString(
-                                "ru-Ru",
+                            {new Date(event.start_time).toLocaleString(
+                                "ru-RU",
                                 {
                                     year: "numeric",
                                     month: "long",
@@ -107,16 +132,13 @@ const EventDetails = ({
                     <Col>
                         <h5>Дата окончания</h5>
                         <p className="text-muted">
-                            {new Date(event.end_time).toLocaleDateString(
-                                "ru-Ru",
-                                {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                }
-                            )}
+                            {new Date(event.end_time).toLocaleString("ru-RU", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}
                         </p>
                     </Col>
                 </Row>
@@ -128,10 +150,8 @@ const EventDetails = ({
                                 Описание мероприятия
                             </h4>
                             <p
-                                style={{
-                                    fontSize: "1.2rem",
-                                    whiteSpace: "pre-line",
-                                }}
+                                className="fs-5"
+                                style={{ whiteSpace: "pre-line" }}
                             >
                                 {event.description}
                             </p>
@@ -149,7 +169,6 @@ const EventDetails = ({
                                 onRegister={onRegister}
                                 isCreator={isCreator}
                                 parentEventId={event.id}
-                                // isRegistered={isRegistered}
                                 isRegisteredForSubEvent={
                                     isRegisteredForSubEvent
                                 }
@@ -162,7 +181,6 @@ const EventDetails = ({
                     </Row>
                 )}
 
-                <Row className="mt-4 text-center"></Row>
                 <Row className="mt-4">
                     <Col>
                         <Button
