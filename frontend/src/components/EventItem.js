@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { EVENT_ROUTE } from "../utils/consts";
 import ShowDetails from "./modals/ShowDetails";
 
-const EventItem = ({ event }) => {
+const EventItem = ({ event, isAuth }) => {
     const [detailsVisible, setDetailsVisible] = useState(false);
     const navigate = useNavigate();
     return (
@@ -12,7 +12,9 @@ const EventItem = ({ event }) => {
             <Card
                 className="mb-3 p-2 border rounded bg-light shadow"
                 border="light"
-                onClick={() => navigate(EVENT_ROUTE + "/" + event.id)}
+                onClick={() => {
+                    if (isAuth) navigate(EVENT_ROUTE + "/" + event.id);
+                }}
             >
                 <Row className="align-items-center">
                     <Col md={4}>

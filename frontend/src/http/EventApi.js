@@ -224,3 +224,23 @@ export const getUserEvents = async () => {
         handleRequestError(error);
     }
 };
+
+export const updateLogo = async (eventId, formData, token) => {
+    try {
+        const { data } = await $authHost.patch(
+            `api/v1/events/${eventId}/logo`,
+            formData,
+            {
+                headers: {
+                    "accept": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+
+        return data;
+    } catch (error) {
+        handleRequestError(error);
+    }
+};

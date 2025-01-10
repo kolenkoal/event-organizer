@@ -6,7 +6,8 @@ import { Context } from "..";
 import { observer } from "mobx-react-lite";
 
 const EventList = observer(() => {
-    const { event } = useContext(Context);
+    const { event, user } = useContext(Context);
+    const isAuth = user.isAuth;
     return (
         <Container
             style={{
@@ -14,7 +15,7 @@ const EventList = observer(() => {
             }}
         >
             {event.events.map((event) => (
-                <EventItem key={event.id} event={event} />
+                <EventItem key={event.id} event={event} isAuth={isAuth} />
             ))}
         </Container>
     );

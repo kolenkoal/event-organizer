@@ -81,11 +81,6 @@ const NavBar = observer(() => {
                                         Заявки
                                     </Dropdown.Item>
                                     <Dropdown.Item
-                                        onClick={() => alert("Перешли туда-то")}
-                                    >
-                                        Туда-то
-                                    </Dropdown.Item>
-                                    <Dropdown.Item
                                         onClick={() => logOut()}
                                         style={{
                                             backgroundColor: "red",

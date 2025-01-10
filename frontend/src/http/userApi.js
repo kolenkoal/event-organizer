@@ -57,7 +57,7 @@ export const check = async () => {
             userData: data,
         };
     } catch (error) {
-        handleRequestError(error);
+        // handleRequestError(error);
         // throw error;
     }
 };

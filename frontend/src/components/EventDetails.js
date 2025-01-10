@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Container,
     Col,
@@ -6,11 +6,13 @@ import {
     Button,
     Collapse,
     ListGroup,
+    Image,
 } from "react-bootstrap";
 import CreateEvent from "./modals/CreateEvent";
 import SubEvents from "./SubEvents";
 import CreateRequest from "./modals/CreateRequest";
 import RequestStatus from "./helper/RequestStatus";
+import LogoUploadModal from "./modals/LogoUploadModal";
 
 const EventDetails = ({
     event,
@@ -25,16 +27,81 @@ const EventDetails = ({
     userId,
     requestStatus,
 }) => {
+    const storedLogo = localStorage.getItem(`eventLogo_${event.id}`);
     const [isEventVisible, setEventVisible] = useState(false);
     const [isParticipantsVisible, setParticipantsVisible] = useState(false);
     const [isRequestVisible, setRequestVisible] = useState(false);
+    const [logoUrl, setLogoUrl] = useState(event.logo_url || "");
+    const [isHovered, setIsHovered] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    console.log(typeof storedLogo);
+
+    useEffect(() => {
+        const type = typeof storedLogo;
+        if (type !== "object") {
+            setLogoUrl(storedLogo.toString());
+        }
+    }, [storedLogo]);
+
     return (
         <div className="d-flex flex-column">
-            <Container fluid className="bg-primary text-white p-4">
-                <Col className="d-flex justify-content-around">
-                    <h1 className="text-center">{event.title}</h1>
+            <Container
+                fluid
+                className="bg-primary text-white d-flex align-items-center py-3"
+            >
+                <Col className="d-flex justify-content-around align-items-center">
+                    {logoUrl ? (
+                        <div
+                            className="position-relative"
+                            style={{
+                                height: "100%",
+                                width: "auto",
+                                maxWidth: "100px",
+                                marginRight: "15px",
+                                cursor: "pointer",
+                            }}
+                            onClick={() => {
+                                if (isCreator) setShowModal(true);
+                            }}
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                        >
+                            <Image
+                                src={logoUrl}
+                                alt="Event Logo"
+                                style={{
+                                    height: "100%", // Занимает всю высоту контейнера
+                                    width: "auto",
+                                    maxWidth: "100px", // Ограничиваем максимальную ширину
+                                    transition: "opacity 0.3s ease",
+                                    opacity: isHovered ? 0.5 : 1, // Затемнение при наведении
+                                }}
+                            />
+                        </div>
+                    ) : (
+                        <Button
+                            variant="outline-light"
+                            className="d-flex align-items-center justify-content-center"
+                            style={{
+                                width: "80px",
+                                height: "80px",
+                                borderRadius: "50%",
+                            }}
+                            onClick={() => {
+                                if (isCreator) setShowModal(true);
+                            }}
+                        >
+                            <i class="bi bi-image-alt"></i>
+                        </Button>
+                    )}
+                    <h1 className="">{event.title}</h1>
                     <RequestStatus requestStatus={requestStatus} />
-
+                    <LogoUploadModal
+                        show={showModal}
+                        handleClose={() => setShowModal(false)}
+                        setLogoUrl={setLogoUrl}
+                        eventId={event.id}
+                    />
                     {requestStatus !== "REJECTED" && (
                         <Row>
                             {isCreator ? (

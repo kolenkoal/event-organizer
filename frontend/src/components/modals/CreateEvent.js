@@ -39,7 +39,7 @@ const CreateEvent = observer(({ show, onHide, event }) => {
             setDescription("");
             setLocation("");
         }
-    }, [event]);
+    }, []);
 
     const addEvent = () => {
         const parsedStartDatetime = new Date(startDate);
@@ -65,7 +65,6 @@ const CreateEvent = observer(({ show, onHide, event }) => {
             });
         }
     };
-    console.log("event details", event);
     return (
         <Modal show={show} onHide={onHide} size="lg" centered>
             <Modal.Header closeButton>
