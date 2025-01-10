@@ -12,7 +12,9 @@ import {
     Card,
     Spinner,
     Alert,
+    Button,
 } from "react-bootstrap";
+import ShowDocuments from "../components/modals/ShowDocuments";
 
 const RequestsPage = ({ userId }) => {
     const [adminRequests, setAdminRequests] = useState([]); // Заявки на мои события (админ)
@@ -21,6 +23,8 @@ const RequestsPage = ({ userId }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedList, setSelectedList] = useState("userRequests"); // Выбранный список
+    const [showDocumentsModal, setShowDocumentsModal] = useState(false); // Состояние для отображения
+    const [documents, setDocuments] = useState([]);
 
     useEffect(() => {
         setLoading(true);
@@ -46,7 +50,7 @@ const RequestsPage = ({ userId }) => {
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, []);
-    console.log("user requests", userRequests);
+
     const handleUpdateStatus = (eventId, userId, newStatus) => {
         try {
             HandleParticipationRequest(eventId, userId, newStatus);
@@ -74,6 +78,16 @@ const RequestsPage = ({ userId }) => {
         );
     }
 
+    const handleViewDocuments = (documentsList) => {
+        setDocuments(documentsList); // Обновляем список документов для этой заявки
+        setShowDocumentsModal(true); // Открываем модальное окно
+    };
+
+    const handleCloseDocumentsModal = () => {
+        setShowDocumentsModal(false); // Закрываем модальное окно
+        setDocuments([]); // Очищаем список документов
+    };
+
     const getDropdownText = () => {
         switch (selectedList) {
             case "adminRequests":
@@ -91,7 +105,7 @@ const RequestsPage = ({ userId }) => {
             : selectedList === "userRequests"
             ? userRequests
             : [];
-    console.log("requests", requests);
+
     return (
         <Container className="mt-4">
             <h2 className="mb-4 text-center">Заявки на участие</h2>
@@ -150,6 +164,23 @@ const RequestsPage = ({ userId }) => {
                                             </Card.Text>
                                         </div>
 
+                                        <Button
+                                            variant="link"
+                                            onClick={() =>
+                                                handleViewDocuments(
+                                                    req.documents || []
+                                                )
+                                            }
+                                        >
+                                            Просмотреть документы
+                                        </Button>
+                                        <ShowDocuments
+                                            show={showDocumentsModal}
+                                            handleClose={
+                                                handleCloseDocumentsModal
+                                            }
+                                            eventId={req.event_id}
+                                        />
                                         {/* Действия администратора */}
                                         {selectedList === "adminRequests" &&
                                             req.status === "PENDING" && (

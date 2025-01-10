@@ -3,27 +3,36 @@ import { Modal, Button, Form } from "react-bootstrap";
 import { RequestParticipation } from "../../http/EventApi";
 
 const CreateRequest = ({ show, onHide, eventId, token }) => {
-    const [files, setFiles] = useState([]);
+    const [selectedFile, setSelectedFile] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const handleFileChange = (e) => {
-        setFiles([...e.target.files]);
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+            // setPreviewUrl(URL.createObjectURL(file));
+        }
     };
 
     const handleSubmit = async () => {
-        if (files.length === 0) {
-            alert("Пожалуйста, прикрепите хотя бы один документ.");
-            return;
-        }
+        if (!selectedFile) return;
+        // if (files.length === 0) {
+        //     alert("Пожалуйста, прикрепите хотя бы один документ.");
+        //     return;
+        // }
 
         setLoading(true);
         const formData = new FormData();
-        files.forEach((file, index) => {
-            formData.append(`documents[${index}]`, file);
-        });
-
+        // files.forEach((file, index) => {
+        //     formData.append(`documents[${index}]`, file);
+        // });
+        formData.append("artifacts", selectedFile);
         try {
-            await RequestParticipation(eventId, formData, token);
+            // const fileName = files[0].name
+            console.log(selectedFile);
+            const output = await RequestParticipation(eventId, formData, token);
+            const pathName = output.artifacts[0];
+            localStorage.setItem(`eventDocument_${eventId}`, pathName);
             alert("Заявка успешно отправлена!");
             onHide();
         } catch (error) {
