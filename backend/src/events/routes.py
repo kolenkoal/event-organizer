@@ -168,6 +168,9 @@ async def create_event(
         if not parent_event:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent event not found")
 
+        if parent_event.organizer_id != user.id:
+            raise HTTPException(status_code=status.HTTP_423_LOCKED, detail="You are not an organizer of parent event")
+
         if not (parent_event.start_time <= event_data.start_time < parent_event.end_time):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -322,7 +325,7 @@ async def get_event_participants(event_id: UUID4, session: Annotated[AsyncSessio
     return EventParticipantsResponse(
         event_id=event_id,
         participants=[
-            {"user_id": participant.user_id, "registration_date": participant.created_at}
+            {"user_id": participant.user_id, "registration_date": participant.created_at, "user": participant.user}
             for participant in participants
         ],
     )

@@ -5,6 +5,8 @@ from datetime import datetime
 from pydantic import UUID4, BaseModel
 from pydantic_settings import SettingsConfigDict
 
+from src.users.schemas import UserRead
+
 
 class ParticipantRole(str, enum.Enum):
     LISTENER = "LISTENER"
@@ -61,6 +63,7 @@ class EventParticipantCreate(BaseModel):
 class EventParticipantWithoutEventResponse(BaseModel):
     user_id: UUID4
     registration_date: datetime
+    user: UserRead
 
     model_config = SettingsConfigDict(from_attributes=True)
 
@@ -73,11 +76,14 @@ class EventParticipantsResponse(BaseModel):
 
 
 class SubEventResponse(BaseModel):
-    id: uuid.UUID
+    id: UUID4
     title: str
+    description: str
     start_time: datetime
     end_time: datetime
-    location: str | None = None
+    location: str
+    created_at: datetime
+    logo_url: str | None = None
 
     model_config = SettingsConfigDict(from_attributes=True)
 
@@ -89,6 +95,8 @@ class EventWithSubEventsResponse(BaseModel):
     start_time: datetime
     end_time: datetime
     location: str | None = None
+    created_at: datetime
+    logo_url: str | None = None
     sub_events: list[SubEventResponse]
 
     model_config = SettingsConfigDict(from_attributes=True)
