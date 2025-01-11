@@ -1,96 +1,67 @@
-import React, { useEffect, useState } from "react";
-import { FetchCurrentEvents, FetchCreatedEvents } from "../http/EventApi";
-import EventItem from "../components/EventItem";
-import { Container, Dropdown, ListGroup } from "react-bootstrap";
+import React, { useContext, useEffect, useState } from 'react';
+import { Card, Form, Button, Container } from 'react-bootstrap';
+import {check, PatchUser} from '../http/userApi'
 
 const Profile = () => {
-    const [participatingEvents, setParticipatingEvents] = useState([]);
-    const [createdEvents, setCreatedEvents] = useState([]);
+    // const {user} = useContext(Context)
+    const [id, setId] = useState('')
+    const [name, setName] = useState('')
+    const [surname, setSurname] = useState('')
+    const [email, setEmail] = useState('')
+
     useEffect(() => {
-        FetchCurrentEvents().then((data) =>
-            setParticipatingEvents(data.events)
-        );
+        check().then((data) => {
+            setId(data.userData.id)
+            setName(data.userData.first_name)
+            setSurname(data.userData.last_name)
+            setEmail(data.userData.email)
+        })
+    }, [])
+    
 
-        FetchCreatedEvents().then((data) => {
-            setCreatedEvents(data.events);
-        });
-    }, []);
-
-    // const createdEvents = [
-    //     {
-    //         id: 1,
-    //         title: "Конференция по React",
-    //         date: "2024-11-25",
-    //         location: "Москва",
-    //     },
-    //     {
-    //         id: 2,
-    //         title: "Хакатон по разработке",
-    //         date: "2024-12-01",
-    //         location: "Санкт-Петербург",
-    //     },
-    // ];
-    console.log("created events", createdEvents);
-    const [selectedList, setSelectedList] = useState("participating");
-
-    const getButtonText = () => {
-        switch (selectedList) {
-            case "created":
-                return "Созданные мероприятиях";
-            // case "participating":
-            //     return "Учавствую в мероприятиях";
-            default:
-                return "Учавствую в мероприятиях";
-        }
+    const handleSubmit = () => {
+        // PatchUser(id, email, 'string', name, surname).then((data) => {
+        //     console.log(data)
+        // })
+        
     };
 
-    const events =
-        selectedList === "created"
-            ? createdEvents
-            : selectedList === "participating"
-            ? participatingEvents
-            : [];
+  return (
+    <Container
+        fluid 
+        style={{
+            height: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+        }}   
+    >
+        <Card 
+            style={{ width: '100%', maxWidth: '500px', margin: 'auto'}}
+        >
 
-    return (
-        <Container className="mt-4">
-            <h2 className="mb-4">Мой профиль</h2>
-
-            <Dropdown>
-                <Dropdown.Toggle variant="primary" id="dropdown-basic">
-                    {getButtonText()}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => setSelectedList("created")}>
-                        Созданные мероприятия
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                        onClick={() => setSelectedList("participating")}
-                    >
-                        Участвую в мероприятиях
-                    </Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>
-
-            {selectedList && (
-                <>
-                    <h4 className="mt-4">
-                        {selectedList === "created"
-                            ? "Созданные мероприятия"
-                            : "Мероприятия, в которых участвую"}
-                    </h4>
-                    {events.length > 0 ? (
-                        <ListGroup className="mt-2">
-                            {events.map((event) => (
-                                <EventItem key={event.id} event={event} />
-                            ))}
-                        </ListGroup>
-                    ) : (
-                        <p className="mt-2">Список пуст</p>
-                    )}
-                </>
-            )}
-        </Container>
-    );
+            <Card.Body>
+                <Card.Title>Профиль пользователя</Card.Title>
+                <Form>
+                <Form.Group className="mb-3">
+                    <Form.Label>Имя</Form.Label>
+                    <Form.Control type="text" name="name" value={name} onChange={(e) => setName(e.target.value)} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Фамилия</Form.Label>
+                    <Form.Control type="text" name="surname" value={surname} onChange={(e) => setSurname(e.target.value)} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </Form.Group>
+                <Button variant="primary" onClick={handleSubmit}>Сохранить</Button>
+                </Form>
+            </Card.Body>
+        </Card>
+    </Container>
+    
+  );
 };
 
 export default Profile;

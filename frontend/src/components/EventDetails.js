@@ -27,21 +27,18 @@ const EventDetails = ({
     userId,
     requestStatus,
 }) => {
-    const storedLogo = localStorage.getItem(`eventLogo_${event.id}`);
+    // const storedLogo = localStorage.getItem(`eventLogo_${event.id}`);
     const [isEventVisible, setEventVisible] = useState(false);
     const [isParticipantsVisible, setParticipantsVisible] = useState(false);
     const [isRequestVisible, setRequestVisible] = useState(false);
     const [logoUrl, setLogoUrl] = useState(event.logo_url || "");
     const [isHovered, setIsHovered] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    console.log(typeof storedLogo);
+    console.log(logoUrl);
 
     useEffect(() => {
-        const type = typeof storedLogo;
-        if (type !== "object") {
-            setLogoUrl(storedLogo.toString());
-        }
-    }, [storedLogo]);
+        setLogoUrl(event.logo_url)
+    }, [event.logo_url]);
 
     return (
         <div className="d-flex flex-column">
@@ -193,7 +190,7 @@ const EventDetails = ({
                         </p>
                     </Col>
                     <Col>
-                        <h5>Адрес</h5>
+                        <h5>Локация</h5>
                         <p className="text-muted">{event.location}</p>
                     </Col>
                     <Col>

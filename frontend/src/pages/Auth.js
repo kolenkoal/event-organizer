@@ -14,6 +14,8 @@ const Auth = observer(() => {
     const isLogin = location.pathname === LOGIN_ROUTE;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [name, setName] = useState("")
+    const [surname, setSurname] = useState("")
     const [isSuccess, setSuccess] = useState(false);
     
     const click = async () => {
@@ -28,8 +30,11 @@ const Auth = observer(() => {
                     navigate(EVENTS_ROUTE);
                 }
             } else {
-                data = await registration(email, password);
+                data = await registration(email, password, name, surname);
                 if (data) {
+                    console.log(data)
+                    user.setUser(data)
+                    user.setIsAuth(true)
                     setSuccess(true);
                     alert("Вы зарегистрировались !");
                     navigate(LOGIN_ROUTE);
@@ -48,18 +53,38 @@ const Auth = observer(() => {
             {/* {isSuccess && <ToastAlert message={"Вы зарегистрировались !"} />} */}
             <Card style={{ width: 600 }} className="p-5">
                 <h2 className="m-auto">
-                    {isLogin ? "Авторизация" : "Регистрация"}
+                    {isLogin ? "Войти" : "Регистрация"}
                 </h2>
                 <Form className="d-flex flex-column">
+                    {!isLogin && (
+                        <>
+                            <h6>Ваше имя</h6>
+                            <Form.Control
+                                className="mb-3"
+                                placeholder=""
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <h6>Ваша Фамилия</h6>
+                            <Form.Control
+                                className="mb-3"
+                                placeholder=""
+                                value={surname}
+                                onChange={(e) => setSurname(e.target.value)}
+                            />
+                        </>  
+                    )}
+                    <h6>Email</h6>
                     <Form.Control
-                        className="mt-3"
-                        placeholder="Введите ваш Email..."
+                        className="mb-3"
+                        placeholder=""
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
+                    <h6>Пароль</h6>
                     <Form.Control
-                        className="mt-3"
-                        placeholder="Введите ваш пароль..."
+                        className=""
+                        placeholder=""
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         type="password"
@@ -67,14 +92,14 @@ const Auth = observer(() => {
                     <Row className="d-flex justify-content-between mt-3 pl-3 pr-3">
                         {isLogin ? (
                             <div className="align-self-start">
-                                Нет Аккаунта ?{" "}
+                                Еще нет аккаунта ?{" "}
                                 <NavLink to={REGISTRATION_ROUTE}>
-                                    Зарегистрируйся
+                                    Зарегистрируйтесь
                                 </NavLink>
                             </div>
                         ) : (
                             <div className="align-self-start">
-                                Есть аккаунт ?{" "}
+                                Уже зарегистрированы ?{" "}
                                 <NavLink to={LOGIN_ROUTE}>Войдите</NavLink>
                             </div>
                         )}

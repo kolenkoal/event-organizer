@@ -16,6 +16,7 @@ const App = observer(() => {
         check()
             .then((data) => {
                 if (data.isFound) {
+                    console.log(data)
                     user.setUser(data.userData);
                     user.setIsAuth(data.isFound);
                     user.setToken(localStorage.getItem("token"));

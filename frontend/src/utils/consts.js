@@ -5,3 +5,4 @@ export const TEST_ROUTE = "/test";
 export const EVENT_ROUTE = "/event";
 export const PROFILE_ROUTE = "/profile";
 export const REQUESTS_ROUTE = "/requests";
+export const PERSONAL_ACCOUNT_ROUTE= "/personal_account";

@@ -9,6 +9,7 @@ const Events = observer(() => {
 
     useEffect(() => {
         FetchEvents().then((data) => {
+            console.log(data)
             event.setEvents(data.events);
         });
     }, [event]);

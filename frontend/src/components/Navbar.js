@@ -7,6 +7,7 @@ import {
     LOGIN_ROUTE,
     PROFILE_ROUTE,
     REQUESTS_ROUTE,
+    PERSONAL_ACCOUNT_ROUTE
 } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +24,9 @@ const NavBar = observer(() => {
         localStorage.removeItem("token");
         navigate(LOGIN_ROUTE);
     };
-    // console.log("NavBar", user);
+    
+    console.log(user._user.email)
+
     return (
         <>
             <Navbar bg="dark" data-bs-theme="dark">
@@ -71,6 +74,11 @@ const NavBar = observer(() => {
                                         <h6>{user._user.email}</h6>
                                     </Dropdown.ItemText>
                                     <Dropdown.Item
+                                        onClick={() => navigate(PERSONAL_ACCOUNT_ROUTE)}
+                                    >
+                                        Личный кабинет
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
                                         onClick={() => navigate(PROFILE_ROUTE)}
                                     >
                                         Профиль
@@ -87,6 +95,8 @@ const NavBar = observer(() => {
                                             color: "white",
                                             fontWeight: "bold",
                                             borderRadius: "5px",
+                                            margin: '5px',
+                                            width: '10.5rem'
                                         }}
                                     >
                                         Выйти
@@ -103,7 +113,7 @@ const NavBar = observer(() => {
                                 variant="outline-light"
                                 onClick={() => navigate(LOGIN_ROUTE)}
                             >
-                                Авторизация
+                                Войти
                             </Button>
                         </Nav>
                     )}

@@ -11,9 +11,11 @@ import {
     EVENT_ROUTE,
     PROFILE_ROUTE,
     REQUESTS_ROUTE,
+    PERSONAL_ACCOUNT_ROUTE
 } from "./utils/consts";
 import { Component } from "react";
 import Requests from "./pages/Requests";
+import PersonalAccount from "./pages/PersonalAccount";
 
 export const authRoutes = [];
 
@@ -45,5 +47,9 @@ export const publicRoutes = [
     {
         path: REQUESTS_ROUTE,
         Component: <Requests />,
+    },
+    {
+        path: PERSONAL_ACCOUNT_ROUTE,
+        Component: <PersonalAccount />,
     },
 ];

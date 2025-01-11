@@ -1,7 +1,7 @@
 import { handleRequestError } from "./handleError";
 import { $authHost, $host } from "./index";
 
-export const registration = async (email, password) => {
+export const registration = async (email, password, first_name, last_name) => {
     try {
         const { data } = await $host.post("api/v1/auth/register", {
             email,
@@ -9,8 +9,8 @@ export const registration = async (email, password) => {
             is_active: true,
             is_superuser: false,
             is_verified: false,
-            first_name: "string",
-            last_name: "string",
+            first_name: first_name,
+            last_name: last_name,
         });
         return data;
     } catch (error) {
@@ -72,3 +72,28 @@ export const logout = async () => {
         // throw error;
     }
 };
+
+export const PatchUser = async (userId, email, password, first_name, last_name, token) => {
+    try {
+        const {data} = await $authHost.patch(
+            "api/v1/users/" + userId,
+            {
+                email,
+                password,
+                is_active: true,
+                is_superuser: true,
+                is_verified: true,
+                first_name,
+                last_name
+            },
+            {
+                headers: {
+                    "accept": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            })
+    } catch (error) {
+        handleRequestError(error)
+    }
+}
