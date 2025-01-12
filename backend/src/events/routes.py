@@ -10,19 +10,20 @@ from src.auth.db_helper import db_helper
 from src.auth.fastapi_users import current_user
 from src.events.dao import EventDAO, EventParticipantDAO
 from src.events.schemas import (
+    AllEventsResponse,
     EventCreateRequest,
     EventParticipantCreate,
     EventParticipantResponse,
     EventParticipantsResponse,
     EventResponse,
     EventUpdateRequest,
+    EventWithSubEvents,
     EventWithSubEventsResponse,
     ParticipantRole,
     ParticipantStatus,
 )
 from src.s3.manager import s3_manager
 from src.users.models import User
-from src.users.schemas import AllEventsResponse, Event, EventWithSubEvents
 
 router = APIRouter(prefix="/events", tags=["Events"])
 
@@ -44,13 +45,17 @@ async def get_current_events(session: Annotated[AsyncSession, Depends(db_helper.
         sub_events = []
         for sub_event in event.sub_events:
             sub_events.append(
-                Event(
+                EventResponse(
                     id=sub_event.id,
                     title=sub_event.title,
                     description=sub_event.description,
                     start_time=sub_event.start_time,
                     end_time=sub_event.end_time,
                     location=sub_event.location,
+                    logo_url=sub_event.logo_url,
+                    organizer_id=sub_event.organizer_id,
+                    created_at=sub_event.created_at,
+                    parent_event_id=sub_event.parent_event_id,
                 )
             )
 
@@ -62,6 +67,9 @@ async def get_current_events(session: Annotated[AsyncSession, Depends(db_helper.
                 start_time=event.start_time,
                 end_time=event.end_time,
                 location=event.location,
+                logo_url=event.logo_url,
+                organizer_id=event.organizer_id,
+                created_at=event.created_at,
                 sub_events=sub_events,
             )
         )
@@ -80,13 +88,16 @@ async def get_current_participate_events(
         sub_events = []
         for sub_event in event.sub_events:
             sub_events.append(
-                Event(
+                EventResponse(
                     id=sub_event.id,
                     title=sub_event.title,
                     description=sub_event.description,
                     start_time=sub_event.start_time,
                     end_time=sub_event.end_time,
                     location=sub_event.location,
+                    logo_url=sub_event.logo_url,
+                    organizer_id=sub_event.organizer_id,
+                    created_at=sub_event.created_at,
                 )
             )
 
@@ -98,6 +109,9 @@ async def get_current_participate_events(
                 start_time=event.start_time,
                 end_time=event.end_time,
                 location=event.location,
+                logo_url=event.logo_url,
+                organizer_id=event.organizer_id,
+                created_at=event.created_at,
                 sub_events=sub_events,
             )
         )
@@ -115,13 +129,16 @@ async def get_my_current_organize_events(
         sub_events = []
         for sub_event in event.sub_events:
             sub_events.append(
-                Event(
+                EventResponse(
                     id=sub_event.id,
                     title=sub_event.title,
                     description=sub_event.description,
                     start_time=sub_event.start_time,
                     end_time=sub_event.end_time,
                     location=sub_event.location,
+                    logo_url=sub_event.logo_url,
+                    organizer_id=sub_event.organizer_id,
+                    created_at=sub_event.created_at,
                 )
             )
 
@@ -133,6 +150,9 @@ async def get_my_current_organize_events(
                 start_time=event.start_time,
                 end_time=event.end_time,
                 location=event.location,
+                logo_url=event.logo_url,
+                organizer_id=event.organizer_id,
+                created_at=event.created_at,
                 sub_events=sub_events,
             )
         )

@@ -111,3 +111,11 @@ class EventParticipantResponse(BaseModel):
     artifacts: list[str] | None = None
 
     model_config = SettingsConfigDict(from_attributes=True)
+
+
+class EventWithSubEvents(EventResponse):
+    sub_events: list[EventResponse] = []
+
+
+class AllEventsResponse(BaseModel):
+    events: list[EventResponse | EventWithSubEvents]
