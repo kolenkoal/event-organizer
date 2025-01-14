@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { RequestParticipation } from "../../http/EventApi";
 
-const CreateRequest = ({ show, onHide, eventId, token }) => {
+const CreateRequest = ({ show, onHide, eventId, token, onRegisterLikeParticipant }) => {
     const [selectedFile, setSelectedFile] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -30,9 +30,9 @@ const CreateRequest = ({ show, onHide, eventId, token }) => {
         try {
             // const fileName = files[0].name
             console.log(selectedFile);
-            const output = await RequestParticipation(eventId, formData, token);
-            const pathName = output.artifacts[0];
-            localStorage.setItem(`eventDocument_${eventId}`, pathName);
+            onRegisterLikeParticipant(eventId, formData)
+            // const pathName = output.artifacts[0];
+            // localStorage.setItem(`eventDocument_${eventId}`, pathName);
             alert("Заявка успешно отправлена!");
             onHide();
         } catch (error) {

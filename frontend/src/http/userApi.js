@@ -76,7 +76,7 @@ export const logout = async () => {
 export const PatchUser = async (userId, email, password, first_name, last_name, token) => {
     try {
         const {data} = await $authHost.patch(
-            "api/v1/users/" + userId,
+            "api/v1/users/me",
             {
                 email,
                 password,
@@ -93,6 +93,8 @@ export const PatchUser = async (userId, email, password, first_name, last_name, 
                     "Content-Type": "application/json",
                 },
             })
+        
+        return data
     } catch (error) {
         handleRequestError(error)
     }

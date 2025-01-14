@@ -20,10 +20,9 @@ const Profile = () => {
     
 
     const handleSubmit = () => {
-        // PatchUser(id, email, 'string', name, surname).then((data) => {
-        //     console.log(data)
-        // })
-        
+        PatchUser(id, email, 'string', name, surname).then((data) => {
+            console.log(data)
+        })  
     };
 
   return (

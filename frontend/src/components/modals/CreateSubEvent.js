@@ -6,8 +6,8 @@ import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 
 const CreateSubEvent = observer(
-    ({ show, onHide, parentEventId, subevent }) => {
-        const { user } = useContext(Context);
+    ({ show, onHide, parentEventId, subevent, onSubEventChange }) => {
+        const { user, event } = useContext(Context);
         const [title, setTitle] = useState("");
         const [startDate, setStartDate] = useState("");
         const [endDate, setEndDate] = useState("");
@@ -52,22 +52,35 @@ const CreateSubEvent = observer(
                 "parent_event_id": parentEventId,
             };
 
-            if (subevent) {
-                // Обновление существующего подмероприятия
-                PatchEvent(subEventData, subevent.id, user.token).then(
-                    (data) => {
-                        onHide();
-                    }
-                );
-            } else {
-                // Добавление нового подмероприятия
-                AddSubEvent(subEventData, user.token, parentEventId).then(
-                    (data) => {
-                        console.log("canceled");
-                        onHide();
-                    }
-                );
+            try {
+                if (subevent) {
+                    // Обновление существующего подмероприятия
+                    PatchEvent(subEventData, subevent.id, user.token).then(
+                        (data) => {
+                            onHide();
+                        }
+                    );
+                } else {
+                    // Добавление нового подмероприятия
+                    AddSubEvent(subEventData, user.token, parentEventId).then(
+                        (data) => {
+                            event.addSubEvent(data)
+                            onHide();
+                        }
+                    );
+                    
+                    setTitle("");
+                    setStartDate("");
+                    setEndDate("");
+                    setDescription("");
+                    setLocation("");
+                    onSubEventChange()
+                }
+            } catch (error) {
+                console.error("Ошибка добавления подмероприятия:", error)
             }
+
+            
         };
 
         return (

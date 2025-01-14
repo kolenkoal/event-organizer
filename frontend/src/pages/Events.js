@@ -6,13 +6,12 @@ import { FetchEvents } from "../http/EventApi";
 
 const Events = observer(() => {
     const { event } = useContext(Context);
-
+    // console.log('events', event)
     useEffect(() => {
         FetchEvents().then((data) => {
-            console.log(data)
             event.setEvents(data.events);
         });
-    }, [event]);
+    }, []);
     return (
         <>
             <EventList />

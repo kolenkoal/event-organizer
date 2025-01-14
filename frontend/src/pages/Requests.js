@@ -105,7 +105,7 @@ const RequestsPage = ({ userId }) => {
             : selectedList === "userRequests"
             ? userRequests
             : [];
-
+    console.log(requests)
     return (
         <Container className="mt-4">
             <h2 className="mb-4 text-center">Заявки на участие</h2>

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { authRoutes, publicRoutes } from "../routes";
 import { Route, Routes, Navigate } from "react-router";
-import { EVENTS_ROUTE, LOGIN_ROUTE } from "../utils/consts";
+import { EVENTS_ROUTE, LOGIN_ROUTE, MAIN_ROUTE } from "../utils/consts";
 import { Context } from "../index";
 
 const AppRouter = () => {
@@ -16,7 +16,7 @@ const AppRouter = () => {
             {publicRoutes.map(({ path, Component }) => (
                 <Route key={path} path={path} element={Component} exact />
             ))}
-            <Route path="*" element={<Navigate to={EVENTS_ROUTE} replace />} />
+            <Route path="*" element={<Navigate to={MAIN_ROUTE} replace />} />
         </Routes>
     );
 };

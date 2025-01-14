@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { ListGroup } from "react-bootstrap";
 import InfoSubEvent from "./InfoSubEvent";
 import { DeleteEvent } from "../http/EventApi";
+import { observer } from "mobx-react-lite";
+import { Context } from "..";
 
 const SubEventList = ({
     subevents,
@@ -12,12 +14,20 @@ const SubEventList = ({
     isCreator,
     isRegisteredForSubEvent,
     setRegisteredForSubEvent,
+    onSubEventChange
 }) => {
     const onDeleteItem = async (id) => {
-        DeleteEvent(id).then((data) => {
-                alert('Subevent has been deleted')
-        })
+        try {
+            await DeleteEvent(id);
+            alert("Подмероприятие удалено");
+
+            // Фильтруем подмероприятия, исключая удалённое
+            onSubEventChange();
+        } catch (error) {
+            console.error("Ошибка при удалении подмероприятия:", error);
+        }
     }
+    
     return (
         <ListGroup
             style={{
@@ -33,7 +43,7 @@ const SubEventList = ({
                         className="p-2"
                         style={{
                             width: "100%",
-                            overflow: "hidden",
+                            // overflow: "hidden",
                         }}
                     >
                         <InfoSubEvent

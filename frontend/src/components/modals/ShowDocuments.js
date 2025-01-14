@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, ListGroup } from "react-bootstrap";
+import { FetchParticipationRequests } from "../../http/EventApi";
 
-const ShowDocuments = ({ show, handleClose, eventId }) => {
-    const [documents, setDocuments] = useState([]);
-
-    useEffect(() => {
-        // Загружаем документы из localStorage при открытии модала
-        const storedDocuments = localStorage.getItem(
-            `eventDocument_${eventId}`
-        );
-        setDocuments(storedDocuments.toString());
-    }, [eventId, show]);
-
+const ShowDocuments = ({ show, handleClose, documents }) => {
+    // const [documents, setDocuments] = useState([]);
+    const checkedDocuments = documents ? documents : ''
+    // console.log(documents)
     function extractAfterLastSlash(url) {
         const parts = url.split("/"); // Разбиваем строку по '/'
         return parts[parts.length - 1]; // Возвращаем последний элемент массива
@@ -23,16 +17,16 @@ const ShowDocuments = ({ show, handleClose, eventId }) => {
                 <Modal.Title>Документы</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {documents.length > 0 ? (
+                {checkedDocuments.length > 0 ? (
                     <ListGroup>
                         {/* {documents.map((doc, index) => ( */}
                         <ListGroup.Item>
                             <a
-                                href={documents}
+                                href={checkedDocuments}
                                 download
                                 className="text-decoration-none"
                             >
-                                {extractAfterLastSlash(documents)} (Скачать)
+                                {extractAfterLastSlash(checkedDocuments)} (Скачать)
                             </a>
                         </ListGroup.Item>
                         {/* ))} */}

@@ -6,8 +6,10 @@ import {
     FetchCreatedEvents,
     FetchCurrentEvents,
     FetchEventParticipants,
+    FetchEvents,
     FetchOneEvent,
     RegisterForEvent,
+    RequestParticipation,
     UnregisterFromEvent,
     getUserParticipationRequests,
 } from "../http/EventApi";
@@ -17,8 +19,8 @@ import { Context } from "..";
 import { observer } from "mobx-react-lite";
 
 const EventPage = observer(() => {
-    const { user } = useContext(Context);
-    const [event, setEvent] = useState({ info: [] });
+    const { user, event } = useContext(Context);
+    const [eventInfo, setEventInfo] = useState({ info: [] });
     const [participants, setParticipants] = useState([]);
     const [subEventId, setSubEventId] = useState("");
     const [isRegisteredForSubEvent, setRegisteredForSubEvent] = useState(false);
@@ -34,34 +36,43 @@ const EventPage = observer(() => {
     };
 
     useEffect(() => {
-        FetchOneEvent(id).then((data) => {
-            setEvent(data);
-        });
-
-        FetchCreatedEvents().then((data) =>
-            data.events.map((event) => {
-                event.id === id ? setCreator(true) : console.log("false");
-            })
-        );
-
-        // !!!!!!!!!!!!! Нужно продумать логику, чтобы конкретные сабивенты подсвечивались, а другие нет
-        FetchCurrentEvents().then((data) => {
-            data.events.map((event) => {
-                event.id === id
-                    ? setRegistered(true)
-                    : console.log("Event page Current Events", "false");
-            });
-        });
-        FetchEventParticipants(id).then((data) => {
-            setParticipants(data.participants);
-        });
-
-        getUserParticipationRequests(id).then((data) => {
-            if (data) {
-                setRequestStatus(data[0].status);
+        const fetchData = async () => {
+            try {
+                // Запускаем все запросы одновременно
+                const [eventData, createdEvents, currentEvents, participantsData, userRequests, allEvents] = await Promise.all([
+                    FetchOneEvent(id),
+                    FetchCreatedEvents(),
+                    FetchCurrentEvents(),
+                    FetchEventParticipants(id),
+                    getUserParticipationRequests(id),
+                    FetchEvents()
+                ]);
+                event.setEvents(allEvents.events)
+                setEventInfo(eventData);
+    
+                // Проверяем, является ли текущий пользователь создателем события
+                const isUserCreator = createdEvents.events.some(event => event.id === id);
+                setCreator(isUserCreator);
+    
+                // Проверяем, зарегистрирован ли пользователь на это событие
+                const isUserRegistered = currentEvents.events.some(event => event.id === id);
+                setRegistered(isUserRegistered);
+    
+                setParticipants(participantsData.participants);
+    
+                // Проверяем статус запроса пользователя
+                if (userRequests && userRequests.length > 0) {
+                    setRequestStatus(userRequests[0].status);
+                }
+    
+            } catch (error) {
+                console.error("Ошибка при загрузке данных события:", error);
             }
-        });
-    }, [subEventId, id]);
+        };
+    
+        fetchData();
+    }, [id]); 
+    // console.log('Events Context', event)
 
     const onRegister = (eventId) => {
         if (!eventId) {
@@ -77,7 +88,7 @@ const EventPage = observer(() => {
 
             return;
         }
-        console.log(eventId, "eventId");
+        // console.log(eventId, "eventId");
         RegisterForEvent(eventId, info).then((data) => {
             if (data) {
                 // setRegisteredForSubEvent(true);
@@ -91,6 +102,20 @@ const EventPage = observer(() => {
         setSubEventId(eventId);
         return true;
     };
+
+    const onRegisterLikeParticipant = (eventId, formData) => {
+        if(!eventId) {
+            RequestParticipation(eventId, formData).then((data) => {
+                setRegistered(true)
+            })
+        }
+
+        RequestParticipation(eventId, formData).then((data) => {
+            setRegistered(true)
+        })
+
+        return true
+    }
 
     const onDeleteItem = () => {
         DeleteEvent(id).then((data) => {
@@ -128,7 +153,7 @@ const EventPage = observer(() => {
 
     return (
         <EventDetails
-            event={event}
+            eventInfo={eventInfo}
             requestStatus={requestStatus}
             userId={user._user.id}
             isRegisteredForSubEvent={isRegisteredForSubEvent}
@@ -139,6 +164,7 @@ const EventPage = observer(() => {
             onUnregister={onUnregister}
             participants={participants}
             setRegisteredForSubEvent={setRegisteredForSubEvent}
+            onRegisterLikeParticipant={onRegisterLikeParticipant}
         />
     );
 });

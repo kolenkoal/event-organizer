@@ -1,4 +1,4 @@
-export const EVENTS_ROUTE = "/";
+export const EVENTS_ROUTE = "/events";
 export const LOGIN_ROUTE = "/login";
 export const REGISTRATION_ROUTE = "/registration";
 export const TEST_ROUTE = "/test";
@@ -6,3 +6,4 @@ export const EVENT_ROUTE = "/event";
 export const PROFILE_ROUTE = "/profile";
 export const REQUESTS_ROUTE = "/requests";
 export const PERSONAL_ACCOUNT_ROUTE= "/personal_account";
+export const MAIN_ROUTE = '/'

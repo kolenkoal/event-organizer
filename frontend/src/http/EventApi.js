@@ -42,7 +42,7 @@ export const AddSubEvent = async (eventData, token, parentEventId) => {
 export const FetchEvents = async () => {
     try {
         const { data } = await $host.get("api/v1/events/all");
-        console.log("Fetch Events", data);
+        // console.log("Fetch Events", data);
         return data;
     } catch (error) {
         handleRequestError(error);

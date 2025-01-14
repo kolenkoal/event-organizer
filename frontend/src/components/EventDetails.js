@@ -7,15 +7,19 @@ import {
     Collapse,
     ListGroup,
     Image,
+    Offcanvas
 } from "react-bootstrap";
 import CreateEvent from "./modals/CreateEvent";
 import SubEvents from "./SubEvents";
 import CreateRequest from "./modals/CreateRequest";
 import RequestStatus from "./helper/RequestStatus";
 import LogoUploadModal from "./modals/LogoUploadModal";
+import AdminRequestsSidebar from "./AdminRequestsSidebar";
+import ParticipantsSidebar from "./ParticipantsSidebar";
+import { observer } from "mobx-react-lite";
 
-const EventDetails = ({
-    event,
+const EventDetails = observer(({
+    eventInfo,
     onRegister,
     isCreator,
     onDeleteItem,
@@ -26,22 +30,36 @@ const EventDetails = ({
     setRegisteredForSubEvent,
     userId,
     requestStatus,
+    onRegisterLikeParticipant
 }) => {
     // const storedLogo = localStorage.getItem(`eventLogo_${event.id}`);
     const [isEventVisible, setEventVisible] = useState(false);
     const [isParticipantsVisible, setParticipantsVisible] = useState(false);
     const [isRequestVisible, setRequestVisible] = useState(false);
-    const [logoUrl, setLogoUrl] = useState(event.logo_url || "");
+    const [logoUrl, setLogoUrl] = useState(eventInfo.logo_url || "");
     const [isHovered, setIsHovered] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    console.log(logoUrl);
 
     useEffect(() => {
-        setLogoUrl(event.logo_url)
-    }, [event.logo_url]);
-
+        setLogoUrl(eventInfo.logo_url)
+    }, [eventInfo.logo_url]);
+    // console.log(pas)
     return (
         <div className="d-flex flex-column">
+            {/* Боковая панель участников */}
+            {isCreator ? (<AdminRequestsSidebar 
+                eventId={eventInfo.id}
+                show={isParticipantsVisible}
+                handleClose={() => setParticipantsVisible(!isParticipantsVisible)}
+            />) : (
+                <ParticipantsSidebar 
+                    show={isParticipantsVisible}
+                    handleClose={() => setParticipantsVisible(!isParticipantsVisible)}
+                    participants={participants}
+                />
+            )}
+            
+            
             <Container
                 fluid
                 className="bg-primary text-white d-flex align-items-center py-3"
@@ -88,18 +106,20 @@ const EventDetails = ({
                                 if (isCreator) setShowModal(true);
                             }}
                         >
-                            <i class="bi bi-image-alt"></i>
+                            <i className="bi bi-image-alt"></i>
                         </Button>
                     )}
-                    <h1 className="">{event.title}</h1>
+                    <h1 className="">{eventInfo.title}</h1>
                     <RequestStatus requestStatus={requestStatus} />
                     <LogoUploadModal
                         show={showModal}
                         handleClose={() => setShowModal(false)}
                         setLogoUrl={setLogoUrl}
-                        eventId={event.id}
+                        eventId={eventInfo.id}
                     />
+                    
                     {requestStatus !== "REJECTED" && (
+                        
                         <Row>
                             {isCreator ? (
                                 <div className="d-flex">
@@ -112,7 +132,7 @@ const EventDetails = ({
                                         Изменить
                                     </Button>
                                     <CreateEvent
-                                        event={event}
+                                        event={eventInfo}
                                         show={isEventVisible}
                                         onHide={() => setEventVisible(false)}
                                     />
@@ -158,10 +178,11 @@ const EventDetails = ({
                                             </Button>
                                             <CreateRequest
                                                 show={isRequestVisible}
-                                                onHide={() =>
+                                                onHide={() =>{
                                                     setRequestVisible(false)
-                                                }
-                                                eventId={event.id}
+                                                }}
+                                                eventId={eventInfo.id}
+                                                onRegisterLikeParticipant={onRegisterLikeParticipant}
                                             />
                                         </div>
                                     )}
@@ -170,6 +191,21 @@ const EventDetails = ({
                         </Row>
                     )}
                 </Col>
+                <Button
+                        variant="light"
+                        className="d-flex align-items-center"
+                        onClick={() => setParticipantsVisible(!isParticipantsVisible)}
+                        style={{
+                            borderRadius: "50%",
+                            width: "50px",
+                            height: "50px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
+                    >
+                        <i className="bi bi-people-fill"></i>
+                    </Button>
             </Container>
 
             <Container className="flex-grow-1 d-flex flex-column justify-content-between py-4">
@@ -177,7 +213,7 @@ const EventDetails = ({
                     <Col>
                         <h5>Дата начала</h5>
                         <p className="text-muted">
-                            {new Date(event.start_time).toLocaleString(
+                            {new Date(eventInfo.start_time).toLocaleString(
                                 "ru-RU",
                                 {
                                     year: "numeric",
@@ -191,12 +227,12 @@ const EventDetails = ({
                     </Col>
                     <Col>
                         <h5>Локация</h5>
-                        <p className="text-muted">{event.location}</p>
+                        <p className="text-muted">{eventInfo.location}</p>
                     </Col>
                     <Col>
                         <h5>Дата окончания</h5>
                         <p className="text-muted">
-                            {new Date(event.end_time).toLocaleString("ru-RU", {
+                            {new Date(eventInfo.end_time).toLocaleString("ru-RU", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
@@ -217,22 +253,22 @@ const EventDetails = ({
                                 className="fs-5"
                                 style={{ whiteSpace: "pre-line" }}
                             >
-                                {event.description}
+                                {eventInfo.description}
                             </p>
                         </div>
                     </Col>
                 </Row>
 
-                {event.sub_events && (
+                {eventInfo.sub_events && (
                     <Row className="mt-4">
                         <Col>
                             <SubEvents
-                                subevents={event.sub_events}
+                                subevents={eventInfo.sub_events}
                                 onDeleteItem={onDeleteItem}
                                 onUnregister={onUnregister}
                                 onRegister={onRegister}
                                 isCreator={isCreator}
-                                parentEventId={event.id}
+                                parentEventId={eventInfo.id}
                                 isRegisteredForSubEvent={
                                     isRegisteredForSubEvent
                                 }
@@ -244,55 +280,9 @@ const EventDetails = ({
                         </Col>
                     </Row>
                 )}
-
-                <Row className="mt-4">
-                    <Col>
-                        <Button
-                            size="lg"
-                            className="shadow w-100"
-                            onClick={() =>
-                                setParticipantsVisible(!isParticipantsVisible)
-                            }
-                            aria-controls="participants-list"
-                            aria-expanded={isParticipantsVisible}
-                        >
-                            {isParticipantsVisible
-                                ? "Скрыть участников"
-                                : `Показать участников (${participants.length})`}
-                        </Button>
-                        <Collapse in={isParticipantsVisible}>
-                            <div
-                                id="participants-list"
-                                className="mt-3 border rounded p-3 bg-light shadow"
-                            >
-                                <h5 className="text-center">Участники</h5>
-                                <ListGroup
-                                    style={{
-                                        maxHeight: "200px",
-                                        overflowY: "auto",
-                                    }}
-                                >
-                                    {participants.length > 0 ? (
-                                        participants.map(
-                                            (participant, index) => (
-                                                <ListGroup.Item key={index}>
-                                                    {participant.user_id}
-                                                </ListGroup.Item>
-                                            )
-                                        )
-                                    ) : (
-                                        <p className="text-muted text-center mt-2">
-                                            Участников пока нет
-                                        </p>
-                                    )}
-                                </ListGroup>
-                            </div>
-                        </Collapse>
-                    </Col>
-                </Row>
             </Container>
         </div>
     );
-};
+});
 
 export default EventDetails;

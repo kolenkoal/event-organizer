@@ -1,13 +1,14 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../index";
 import { Navbar, Nav, Button, Container, Dropdown } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
     EVENTS_ROUTE,
     LOGIN_ROUTE,
     PROFILE_ROUTE,
     REQUESTS_ROUTE,
-    PERSONAL_ACCOUNT_ROUTE
+    PERSONAL_ACCOUNT_ROUTE,
+    MAIN_ROUTE
 } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ import CreateEvent from "./modals/CreateEvent";
 const NavBar = observer(() => {
     const { user } = useContext(Context);
     const navigate = useNavigate();
+    const location = useLocation()
     const [eventVisible, setEventVisible] = useState(false);
 
     const logOut = () => {
@@ -25,12 +27,18 @@ const NavBar = observer(() => {
         navigate(LOGIN_ROUTE);
     };
     
-    console.log(user._user.email)
+    // console.log(location)
 
     return (
         <>
             <Navbar bg="dark" data-bs-theme="dark">
                 <Container>
+                    <Button
+                        variant="dark"
+                        onClick={() => navigate(MAIN_ROUTE)}
+                    >
+                        Главная
+                    </Button>
                     <Button
                         variant="dark"
                         onClick={() => navigate(EVENTS_ROUTE)}
@@ -42,11 +50,11 @@ const NavBar = observer(() => {
                             className="ml-auto"
                             style={{ color: "white", margin: "0 0 0 auto" }}
                         >
-                            <div style={{ margin: "0 10px" }}>
+                            {location.pathname !== '/' && <div style={{ margin: "0 10px" }}>
                                 <Button onClick={() => setEventVisible(true)}>
                                     Создать мероприятие
                                 </Button>
-                            </div>
+                            </div>}
                             <CreateEvent
                                 show={eventVisible}
                                 onHide={() => setEventVisible(false)}
