@@ -4,5 +4,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+        volumes:
+            - /usr/share/nginx/html:/usr/share/nginx/html  # Прокидываем файлы наружу
         ports:
             - "3000:80"
