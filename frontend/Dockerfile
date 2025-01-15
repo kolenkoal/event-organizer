@@ -10,9 +10,9 @@ COPY . .
 
 RUN npm run build
 
-FROM nginx:1.18 AS production-stage
+FROM nginx:1.23 AS production-stage
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build-stage nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=build-stage /app/build /usr/share/nginx/html
 
