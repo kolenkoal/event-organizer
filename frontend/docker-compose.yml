@@ -5,7 +5,7 @@ services:
             context: .
             dockerfile: Dockerfile
         ports:
-            - "3000:80"
+            - "3000:5162"
 # version: "3.8"
 
 # services:
