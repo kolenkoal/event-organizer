@@ -462,9 +462,7 @@ async def get_user_participation_requests(
     user_requests = [request for request in participation_requests if request.user_id == user.id]
 
     if not user_requests:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No participation requests found for this user"
-        )
+        return []
 
     return user_requests
 
