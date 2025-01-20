@@ -12,6 +12,7 @@ from src.events.dao import EventDAO, EventParticipantDAO
 from src.events.schemas import (
     AllEventsResponse,
     EventCreateRequest,
+    EventListenersResponse,
     EventParticipantCreate,
     EventParticipantResponse,
     EventParticipantsResponse,
@@ -26,6 +27,7 @@ from src.s3.manager import s3_manager
 from src.users.models import User
 
 router = APIRouter(prefix="/events", tags=["Events"])
+router_v2 = APIRouter(prefix="/events", tags=["EventsV2"])
 
 
 ALLOWED_MIME_TYPES = {
@@ -351,6 +353,46 @@ async def get_event_participants(event_id: UUID4, session: Annotated[AsyncSessio
     )
 
 
+@router_v2.get("/{event_id}/listeners", response_model=EventListenersResponse)
+async def get_event_listeners(event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    participants = await EventParticipantDAO.get_event_participants_by_role(
+        session=session, event_id=event_id, role=ParticipantRole.LISTENER
+    )
+
+    return EventListenersResponse(
+        event_id=event_id,
+        listeners=[
+            {"user_id": participant.user_id, "registration_date": participant.created_at, "user": participant.user}
+            for participant in participants
+        ],
+    )
+
+
+@router_v2.get("/{event_id}/participants", response_model=EventParticipantsResponse)
+async def get_event_participants_v2(
+    event_id: UUID4, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+):
+    event = await EventDAO.find_by_id(session=session, model_id=event_id)
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    participants = await EventParticipantDAO.get_event_participants_by_role(
+        session=session, event_id=event_id, role=ParticipantRole.PARTICIPANT
+    )
+
+    return EventParticipantsResponse(
+        event_id=event_id,
+        participants=[
+            {"user_id": participant.user_id, "registration_date": participant.created_at, "user": participant.user}
+            for participant in participants
+        ],
+    )
+
+
 @router.post("/{event_id}/request_participation", response_model=EventParticipantResponse)
 async def request_participation(
     event_id: UUID4,
@@ -462,9 +504,7 @@ async def get_user_participation_requests(
     user_requests = [request for request in participation_requests if request.user_id == user.id]
 
     if not user_requests:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No participation requests found for this user"
-        )
+        return []
 
     return user_requests
 

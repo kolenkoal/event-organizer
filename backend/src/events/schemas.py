@@ -75,6 +75,13 @@ class EventParticipantsResponse(BaseModel):
     model_config = SettingsConfigDict(from_attributes=True)
 
 
+class EventListenersResponse(BaseModel):
+    event_id: UUID4
+    listeners: list[EventParticipantWithoutEventResponse]
+
+    model_config = SettingsConfigDict(from_attributes=True)
+
+
 class SubEventResponse(BaseModel):
     id: UUID4
     title: str
