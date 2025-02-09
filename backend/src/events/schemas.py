@@ -120,6 +120,9 @@ class EventParticipantResponse(BaseModel):
     model_config = SettingsConfigDict(from_attributes=True)
 
 
+class EventParticipantResponseRequests(EventParticipantResponse):
+    user: UserRead
+
 class EventWithSubEvents(EventResponse):
     sub_events: list[EventResponse] = []
 
