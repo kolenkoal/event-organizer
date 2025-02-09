@@ -117,12 +117,12 @@ const RequestsPage = ({ userId }) => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <Dropdown.Item
-                        onClick={() => setSelectedList("adminRequests")}
+                        onClick={() => setSelectedList("userRequests")}
                     >
                         Заявки на мои мероприятия
                     </Dropdown.Item>
                     <Dropdown.Item
-                        onClick={() => setSelectedList("userRequests")}
+                        onClick={() => setSelectedList("adminRequests")}
                     >
                         Мои заявки на участие
                     </Dropdown.Item>
@@ -147,9 +147,15 @@ const RequestsPage = ({ userId }) => {
                                             <Card.Title>
                                                 {selectedList ===
                                                 "adminRequests"
-                                                    ? req.user_id
+                                                    ? req.user.first_name + ' ' + req.user.last_name
                                                     : req.event_id}
                                             </Card.Title>
+                                            <Card.Text>
+                                                {selectedList ===
+                                                    "adminRequests"
+                                                        ? req.user.email 
+                                                        : req.event_id}
+                                            </Card.Text>
                                             <Card.Text
                                                 className={`text-${
                                                     req.status === "APPROVED"

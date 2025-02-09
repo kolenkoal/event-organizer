@@ -17,6 +17,7 @@ import LogoUploadModal from "./modals/LogoUploadModal";
 import AdminRequestsSidebar from "./AdminRequestsSidebar";
 import ParticipantsSidebar from "./ParticipantsSidebar";
 import { observer } from "mobx-react-lite";
+import { FetchEventParticipants } from "../http/EventApi";
 
 const EventDetails = observer(({
     eventInfo,
@@ -40,11 +41,32 @@ const EventDetails = observer(({
     const [logoUrl, setLogoUrl] = useState(eventInfo.logo_url || "");
     const [isHovered, setIsHovered] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [totalSubEventParticipants, setTotalSubEventParticipants] = useState(0);
 
     useEffect(() => {
         setLogoUrl(eventInfo.logo_url)
     }, [eventInfo.logo_url]);
-    // console.log(pas)
+
+    useEffect(() => {
+        const fetchSubEventParticipants = async () => {
+            if (eventInfo.sub_events && eventInfo.sub_events.length > 0) {
+                let total = 0;
+                for (const subEvent of eventInfo.sub_events) {
+                    try {
+                        const participants = await FetchEventParticipants(subEvent.id);
+                        // console.log('part', participants)
+                        total += participants.participants.length;
+                    } catch (error) {
+                        console.error("Ошибка при получении участников подмероприятия:", error);
+                    }
+                }
+                setTotalSubEventParticipants(total);
+            }
+        };
+
+        fetchSubEventParticipants();
+    }, [eventInfo.sub_events]);
+    
     return (
         <div className="d-flex flex-column">
             {/* Боковая панель участников */}
@@ -245,7 +267,10 @@ const EventDetails = observer(({
                     </Col>
                     <Col>
                         <h5>Всего людей</h5>
-                        <p className="text-muted">{listeners.length + participants.length}</p>
+                        <p className="text-muted">
+                            {listeners.length + participants.length + totalSubEventParticipants}
+                            {` (В подмероприятиях: ${totalSubEventParticipants})`}
+                        </p>
                     </Col>
                 </Row>
 

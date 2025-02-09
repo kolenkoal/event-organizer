@@ -3,6 +3,7 @@ import { Row, Col, Button } from "react-bootstrap";
 import { DeleteEvent, FetchEventParticipants, RegisterForEvent } from "../http/EventApi";
 import { Context } from "..";
 import CreateSubEvent from "./modals/CreateSubEvent";
+import SubEventParticipantsModal from "./modals/SubEventParticipantsModal";
 
 const InfoSubEvent = ({
     event,
@@ -29,7 +30,15 @@ const InfoSubEvent = ({
     };
     const [isRegisteredForSubEvent, setRegisteredForSubEvent] = useState(false);
     const [isEventVisible, setEventVisible] = useState(false);
-    
+
+    const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+    const [selectedSubEventId, setSelectedSubEventId] = useState(null);
+
+    const handleShowParticipants = (subEventId) => {
+        setSelectedSubEventId(subEventId);
+        setShowParticipantsModal(true);
+    };
+
     useEffect(() => {
         FetchEventParticipants(event.id).then((data) => {
             if (data) {
@@ -70,61 +79,79 @@ const InfoSubEvent = ({
                 {formatDate(event.end_time)}
             </Col>
             <Col className="text-wrap text-truncate">{event.location}</Col>
-            <Col className="text-wrap ">{count} участников</Col>
+            <Col className="text-wrap ">
+                <Row> {count} участников</Row>
+                
+            </Col>
             <Col xs="auto" className="text-end">
-                {isCreator ? (
-                    <div className='d-flex gap-1'>
-                        <Button
-                            // className="btn btn-danger btn-sm m-1"
-                            variant='outline-danger'
-                            onClick={() => setEventVisible(true)}
-                        >
-                            Редактировать
-                        </Button>
-                        <CreateSubEvent 
-                            subevent={event}
-                            show={isEventVisible}
-                            onHide={() => setEventVisible(false)}
-                        />
-                        <Button
-                            // className="btn btn-danger btn-sm"
-                            variant='danger'
-                            onClick={() => onDeleteItem(event.id)}
-                        >
-                            <i className="bi bi-trash"></i>
-                        </Button>
-                    </div>
-                ) : (
-                    <>
-                        {isRegisteredForSubEvent ? (
-                            <button
-                                className="btn btn-danger btn-sm"
-                                onClick={() => {
-                                    const flag = onUnregister(event.id);
-                                    if (flag) {
-                                        setRegisteredForSubEvent(false);
-                                    }
-                                    setCount(count - 1);
-                                }}
+                <Row> 
+                    <Button 
+                        className="btn btn-sm mb-1"
+                        onClick={() => handleShowParticipants(event.id)}
+                    >
+                        Показать
+                    </Button>
+                    <SubEventParticipantsModal
+                        show={showParticipantsModal}
+                        onHide={() => setShowParticipantsModal(false)}
+                        subEventId={selectedSubEventId}
+                    />
+                </Row>
+                <Row>
+                    {isCreator ? (
+                        <div className='d-flex gap-1'>
+                            <Button
+                                // className="btn btn-danger btn-sm m-1"
+                                variant='outline-danger'
+                                onClick={() => setEventVisible(true)}
                             >
-                                Отписаться
-                            </button>
-                        ) : (
-                            <button
-                                className="btn btn-success btn-sm"
-                                onClick={() => {
-                                    const flag = onRegister(event.id);
-                                    if (flag) {
-                                        setRegisteredForSubEvent(true);
-                                    }
-                                    setCount(count + 1);
-                                }}
+                                Редактировать
+                            </Button>
+                            <CreateSubEvent 
+                                subevent={event}
+                                show={isEventVisible}
+                                onHide={() => setEventVisible(false)}
+                            />
+                            <Button
+                                // className="btn btn-danger btn-sm"
+                                variant='danger'
+                                onClick={() => onDeleteItem(event.id)}
                             >
-                                Записаться
-                            </button>
-                        )}
-                    </>
-                )}
+                                <i className="bi bi-trash"></i>
+                            </Button>
+                        </div>
+                    ) : (
+                        <>
+                            {isRegisteredForSubEvent ? (
+                                <Button
+                                    className="btn btn-danger btn-sm"
+                                    onClick={() => {
+                                        const flag = onUnregister(event.id);
+                                        if (flag) {
+                                            setRegisteredForSubEvent(false);
+                                        }
+                                        setCount(count - 1);
+                                    }}
+                                >
+                                    Отписаться
+                                </Button>
+                            ) : (
+                                <Button
+                                    className="btn btn-success btn-sm"
+                                    onClick={() => {
+                                        const flag = onRegister(event.id);
+                                        if (flag) {
+                                            setRegisteredForSubEvent(true);
+                                        }
+                                        setCount(count + 1);
+                                    }}
+                                >
+                                    Записаться
+                                </Button>
+                            )}
+                        </>
+                    )} 
+                </Row>
             </Col>
         </Row>
     );
