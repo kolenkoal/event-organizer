@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from src.dao import BaseDAO
 from src.events.models import Event, EventParticipant
 from src.events.schemas import ParticipantRole, ParticipantStatus
+from src.users.models import User
 
 
 class EventDAO(BaseDAO):
@@ -123,6 +124,20 @@ class EventParticipantDAO(BaseDAO):
         query = select(EventParticipant).filter(
             EventParticipant.event_id == event_id, EventParticipant.role == ParticipantRole.PARTICIPANT
         )
+
+        if status_filter:
+            query = query.filter(EventParticipant.status == status_filter)
+
+        result = await session.execute(query)
+        participants = result.scalars().all()
+
+        return participants
+
+    @staticmethod
+    async def get_participation_requests_event(
+            session: AsyncSession, event_id: UUID4, user_id: uuid.UUID, status_filter: ParticipantStatus | None = None
+    ):
+        query = select(EventParticipant).join(User, user_id == User.id).filter(EventParticipant.event_id == event_id)
 
         if status_filter:
             query = query.filter(EventParticipant.status == status_filter)

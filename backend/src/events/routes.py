@@ -21,7 +21,7 @@ from src.events.schemas import (
     EventWithSubEvents,
     EventWithSubEventsResponse,
     ParticipantRole,
-    ParticipantStatus,
+    ParticipantStatus, EventParticipantResponseRequests,
 )
 from src.s3.manager import s3_manager
 from src.users.models import User
@@ -441,7 +441,7 @@ async def request_participation(
     return await EventParticipantDAO.create(session=session, **event_participant_data.model_dump())
 
 
-@router.get("/{event_id}/participation_requests", response_model=list[EventParticipantResponse])
+@router.get("/{event_id}/participation_requests", response_model=list[EventParticipantResponseRequests])
 async def get_participation_requests(
     event_id: UUID4,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -455,8 +455,8 @@ async def get_participation_requests(
     if event.organizer_id != user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not the organizer of this event")
 
-    participants = await EventParticipantDAO.get_participation_requests(
-        session=session, event_id=event_id, status_filter=status_filter
+    participants = await EventParticipantDAO.get_participation_requests_event(
+        session=session, event_id=event_id, user_id=user.id, status_filter=status_filter
     )
     return participants
 
