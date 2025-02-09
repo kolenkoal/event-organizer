@@ -11,6 +11,8 @@ import {
     RegisterForEvent,
     RequestParticipation,
     UnregisterFromEvent,
+    getEventListeners,
+    getEventParticipants,
     getUserParticipationRequests,
 } from "../http/EventApi";
 import EventDetails from "../components/EventDetails";
@@ -22,6 +24,7 @@ const EventPage = observer(() => {
     const { user, event } = useContext(Context);
     const [eventInfo, setEventInfo] = useState({ info: [] });
     const [participants, setParticipants] = useState([]);
+    const [listeners, setListeners] = useState([])
     const [subEventId, setSubEventId] = useState("");
     const [isRegisteredForSubEvent, setRegisteredForSubEvent] = useState(false);
     const [isCreator, setCreator] = useState(false);
@@ -39,13 +42,14 @@ const EventPage = observer(() => {
         const fetchData = async () => {
             try {
                 // Запускаем все запросы одновременно
-                const [eventData, createdEvents, currentEvents, participantsData, userRequests, allEvents] = await Promise.all([
+                const [eventData, createdEvents, currentEvents, participantsData, userRequests, allEvents, listenersData] = await Promise.all([
                     FetchOneEvent(id),
                     FetchCreatedEvents(),
                     FetchCurrentEvents(),
-                    FetchEventParticipants(id),
+                    getEventParticipants(id),
                     getUserParticipationRequests(id),
-                    FetchEvents()
+                    FetchEvents(),
+                    getEventListeners(id),
                 ]);
                 event.setEvents(allEvents.events)
                 setEventInfo(eventData);
@@ -59,7 +63,8 @@ const EventPage = observer(() => {
                 setRegistered(isUserRegistered);
     
                 setParticipants(participantsData.participants);
-    
+                setListeners(listenersData.listeners)
+
                 // Проверяем статус запроса пользователя
                 if (userRequests && userRequests.length > 0) {
                     setRequestStatus(userRequests[0].status);
@@ -163,6 +168,7 @@ const EventPage = observer(() => {
             onDeleteItem={onDeleteItem}
             onUnregister={onUnregister}
             participants={participants}
+            listeners={listeners}
             setRegisteredForSubEvent={setRegisteredForSubEvent}
             onRegisterLikeParticipant={onRegisterLikeParticipant}
         />

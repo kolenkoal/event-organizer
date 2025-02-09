@@ -244,3 +244,28 @@ export const updateLogo = async (eventId, formData, token) => {
         handleRequestError(error);
     }
 };
+
+
+export const getEventListeners = async (eventId) => {
+    try {
+        const {data} = await $authHost.get(
+            `api/v2/events/${eventId}/listeners`
+        )
+
+        return data
+    } catch (error) {
+        handleRequestError(error)
+    }
+}
+
+export const getEventParticipants = async (eventId) => {
+    try {
+        const {data} = await $authHost.get(
+            `api/v2/events/${eventId}/participants`
+        )
+
+        return data
+    } catch (error) {
+        handleRequestError(error)
+    }
+}

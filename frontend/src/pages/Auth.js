@@ -48,12 +48,14 @@ const Auth = observer(() => {
                     user.setIsAuth(true);
                     user.setToken(data);
                     navigate(EVENTS_ROUTE);
+                    localStorage.setItem('isAuth', true)
                 }
             } else {
                 data = await registration(email, password, name, surname);
                 if (data) {
                     user.setUser(data);
                     user.setIsAuth(true);
+                    localStorage.setItem('isAuth', true)
                     alert("Вы зарегистрировались !");
                     navigate(LOGIN_ROUTE);
                 }

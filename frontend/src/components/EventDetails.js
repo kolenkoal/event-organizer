@@ -30,7 +30,8 @@ const EventDetails = observer(({
     setRegisteredForSubEvent,
     userId,
     requestStatus,
-    onRegisterLikeParticipant
+    onRegisterLikeParticipant,
+    listeners
 }) => {
     // const storedLogo = localStorage.getItem(`eventLogo_${event.id}`);
     const [isEventVisible, setEventVisible] = useState(false);
@@ -56,6 +57,7 @@ const EventDetails = observer(({
                     show={isParticipantsVisible}
                     handleClose={() => setParticipantsVisible(!isParticipantsVisible)}
                     participants={participants}
+                    listeners={listeners}
                 />
             )}
             
@@ -240,6 +242,10 @@ const EventDetails = observer(({
                                 minute: "2-digit",
                             })}
                         </p>
+                    </Col>
+                    <Col>
+                        <h5>Всего людей</h5>
+                        <p className="text-muted">{listeners.length + participants.length}</p>
                     </Col>
                 </Row>
 

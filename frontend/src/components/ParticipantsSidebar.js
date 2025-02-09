@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import { Offcanvas, ListGroup, Button, ToggleButtonGroup, ToggleButton } from "react-bootstrap";
 
-const ParticipantsSidebar = ({ show, handleClose, participants }) => {
+const ParticipantsSidebar = ({ show, handleClose, participants, listeners }) => {
     const [viewMode, setViewMode] = useState("listeners"); // "listeners" или "participants"
-    // console.log(participants)
-    // Фильтруем участников по их роли
-    const listeners = participants.filter((p) => p.role === "listener");
-    const activeParticipants = participants.filter((p) => p.role === "participant");
-    // console.log(participants[0].user.first_name)
+    
+    // const listeners = participants.filter((p) => p.role === "listener");
+    // const activeParticipants = participants.filter((p) => p.role === "participant");
     return (
-        <Offcanvas show={show} onHide={handleClose} backdrop={false} placement="start">
+        <Offcanvas show={show} onHide={handleClose} backdrop={false} placement="end">
             <Offcanvas.Header closeButton>
                 <Offcanvas.Title>
                     {viewMode === "listeners"
-                        ? `Слушатели (${participants.length})`
-                        : `Участники (${activeParticipants.length})`}
+                        ? `Слушатели (${listeners.length})`
+                        : `Участники (${participants.length})`}
+                    
                 </Offcanvas.Title>
             </Offcanvas.Header>
 
@@ -22,25 +21,25 @@ const ParticipantsSidebar = ({ show, handleClose, participants }) => {
                 {/* Переключатель режимов */}
                 <ToggleButtonGroup type="radio" name="viewMode" value={viewMode} onChange={setViewMode} className="w-100 mb-3">
                     <ToggleButton id="btn-listeners" variant="outline-primary" value="listeners">
-                        Слушатели ({participants.length})
+                        Слушатели ({listeners.length})
                     </ToggleButton>
                     <ToggleButton id="btn-participants" variant="outline-success" value="participants">
-                        Участники ({activeParticipants.length})
+                        Участники ({participants.length})
                     </ToggleButton>
                 </ToggleButtonGroup>
 
                 {/* Список участников */}
                 <ListGroup>
-                    {viewMode === "listeners" && participants.length > 0 ? (
+                    {viewMode === "participants" && participants.length > 0 ? (
                         participants.map((participant, index) => (
                             <ListGroup.Item key={index}>
                                 {participant.user ? participant.user.first_name : ''} {participant?.user ? participant?.user.last_name : ''}
                             </ListGroup.Item>
                         ))
-                    ) : viewMode === "participants" && activeParticipants.length > 0 ? (
-                        activeParticipants.map((participant, index) => (
+                    ) : viewMode === "listeners" && listeners.length > 0 ? (
+                        listeners.map((listener, index) => (
                             <ListGroup.Item key={index}>
-                                {/* {participant.user.first_name} {participant.user.last_name} */}
+                                {listener.user.first_name} {listener.user.last_name}
                             </ListGroup.Item>
                         ))
                     ) : (
@@ -50,7 +49,7 @@ const ParticipantsSidebar = ({ show, handleClose, participants }) => {
                     )}
                 </ListGroup>
             </Offcanvas.Body>
-        </Offcanvas>
+        </Offcanvas> 
     );
 };
 

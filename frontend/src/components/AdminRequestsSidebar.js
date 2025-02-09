@@ -30,7 +30,7 @@ const AdminRequestsSidebar = ({ eventId, show, handleClose }) => {
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, [eventId]);
-    // console.log
+    console.log(adminRequests)
     const handleUpdateStatus = (userId, newStatus) => {
         try {
             HandleParticipationRequest(eventId, userId, newStatus);
