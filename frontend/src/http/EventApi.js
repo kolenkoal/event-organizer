@@ -254,7 +254,7 @@ export const getEventListeners = async (eventId) => {
 
         return data
     } catch (error) {
-        handleRequestError(error)
+        // handleRequestError(error)
     }
 }
 
@@ -266,6 +266,6 @@ export const getEventParticipants = async (eventId) => {
 
         return data
     } catch (error) {
-        handleRequestError(error)
+        // handleRequestError(error)
     }
 }
