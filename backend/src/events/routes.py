@@ -15,13 +15,14 @@ from src.events.schemas import (
     EventListenersResponse,
     EventParticipantCreate,
     EventParticipantResponse,
+    EventParticipantResponseRequests,
     EventParticipantsResponse,
     EventResponse,
     EventUpdateRequest,
     EventWithSubEvents,
     EventWithSubEventsResponse,
     ParticipantRole,
-    ParticipantStatus, EventParticipantResponseRequests,
+    ParticipantStatus,
 )
 from src.s3.manager import s3_manager
 from src.users.models import User
@@ -509,7 +510,7 @@ async def get_user_participation_requests(
     return user_requests
 
 
-@router.get("/users/my/events-participation", response_model=list[EventParticipantResponse])
+@router.get("/users/my/events-participation", response_model=list[EventParticipantResponseRequests])
 async def get_user_events(
     session: AsyncSession = Depends(db_helper.session_getter), user: User = Depends(current_user)
 ):
