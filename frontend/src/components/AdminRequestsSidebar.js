@@ -26,11 +26,14 @@ const AdminRequestsSidebar = ({ eventId, show, handleClose }) => {
 
         setLoading(true);
         FetchParticipationRequests(eventId)
-            .then((data) => setAdminRequests(data))
+            .then((data) => {
+                const filteredParticipants = data.filter(participant => participant.role === 'PARTICIPANT');
+                setAdminRequests(filteredParticipants);
+            })
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, [eventId]);
-    console.log(adminRequests)
+    console.log('admin request', adminRequests)
     const handleUpdateStatus = (userId, newStatus) => {
         try {
             HandleParticipationRequest(eventId, userId, newStatus);
@@ -55,7 +58,7 @@ const AdminRequestsSidebar = ({ eventId, show, handleClose }) => {
     };
     // console.log(adminRequests)
     return (
-        <Offcanvas show={show} onHide={handleClose} backdrop={false} placement="end">
+        <Offcanvas show={show} onHide={handleClose} backdrop={false} placement="end" style={{width: 'auto'}}>
             <Offcanvas.Header closeButton>
                 <Offcanvas.Title>Заявки на участие</Offcanvas.Title>
             </Offcanvas.Header>
@@ -70,7 +73,13 @@ const AdminRequestsSidebar = ({ eventId, show, handleClose }) => {
                             <Card key={req.artifacts} className="mb-3 shadow-sm">
                                 <Card.Body className="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <Card.Title>{"Name Surname"}</Card.Title>
+                                        <Card.Title>
+                                            {req?.user.first_name + " " + req?.user.last_name}
+                                            {/* <p className=''>{req?.user.email}</p> */}
+                                        </Card.Title>
+                                        <Card.Text>
+                                            {req?.user.email}
+                                        </Card.Text>
                                         <Card.Text
                                             className={`text-${
                                                 req.status === "APPROVED"

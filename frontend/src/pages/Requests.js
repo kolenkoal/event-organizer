@@ -4,6 +4,7 @@ import {
     FetchCreatedEvents,
     getUserEvents,
     HandleParticipationRequest,
+    FetchOneEvent,
 } from "../http/EventApi";
 import {
     Container,
@@ -40,21 +41,36 @@ const RequestsPage = ({ userId }) => {
                 );
             })
             .then((allRequests) => {
-                setAdminRequests(allRequests.flat());
+                const filteredParticipants = allRequests.flat().filter(participant => participant.role === 'PARTICIPANT');
+                // console.log('all request', allRequests)
+                // console.log('filtered', filteredParticipants)
+                setAdminRequests(filteredParticipants);
+                // setAdminRequests(allRequests.flat());
             })
             .catch((err) => setError(err.message));
-
+        
         // Загружаем заявки пользователя на участие в мероприятиях
         getUserEvents()
             .then((data) => setUserRequests(data))
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, []);
+    // console.log('user request', userRequests)
+
+    function getEventNameById(eventId) {
+        const event = createdEvents.find(event => event.id === eventId);
+        return event ? event.title : 'Мероприятие не найдено';
+    }
+
+    const getUserEventNameById = (eventId) => {
+        const event = userRequests.find(event => event.id === eventId)
+        return event ? event.title : 'Мероприятие не найдено'
+    };
 
     const handleUpdateStatus = (eventId, userId, newStatus) => {
         try {
             HandleParticipationRequest(eventId, userId, newStatus);
-
+            
             // Обновляем заявки для администраторского просмотра
             setAdminRequests((prevRequests) =>
                 prevRequests.map((req) =>
@@ -105,7 +121,7 @@ const RequestsPage = ({ userId }) => {
             : selectedList === "userRequests"
             ? userRequests
             : [];
-    console.log(requests)
+    console.log('request', requests)
     return (
         <Container className="mt-4">
             <h2 className="mb-4 text-center">Заявки на участие</h2>
@@ -137,103 +153,104 @@ const RequestsPage = ({ userId }) => {
                             ? "Заявки на мои мероприятия"
                             : "Мои заявки на участие"}
                     </h4>
-
                     {requests.length > 0 ? (
                         <ListGroup className="mt-3">
+                            <Card className="mb-3 shadow-sm">
+                                <Card.Body
+                                    className="d-grid text-center fw-bold"
+                                    style={{ gridTemplateColumns: "2fr 1fr 3fr 2fr 2fr", gap: "10px" }}
+                                >
+                                    <div>Пользователь</div>
+                                    <div>Статус</div>
+                                    <div>Название мероприятия</div>
+                                    <div>Документы</div>
+                                    <div>Действия</div>
+                                </Card.Body>
+                            </Card>
                             {requests.map((req) => (
                                 <Card key={req.id} className="mb-3 shadow-sm">
-                                    <Card.Body className="d-flex justify-content-between align-items-center">
+                                    <Card.Body
+                                        className="d-grid text-center"
+                                        style={{ gridTemplateColumns: "2fr 1fr 3fr 2fr 2fr", gap: "10px" }}
+                                    >
+                                        {/* Пользователь */}
                                         <div>
-                                            <Card.Title>
-                                                {selectedList ===
-                                                "adminRequests"
-                                                    ? req.user.first_name + ' ' + req.user.last_name
+                                            <Card.Title className="mb-1">
+                                                {selectedList === "adminRequests"
+                                                    ? req.user.first_name + " " + req.user.last_name
                                                     : req.event_id}
                                             </Card.Title>
-                                            <Card.Text>
-                                                {selectedList ===
-                                                    "adminRequests"
-                                                        ? req.user.email 
-                                                        : req.event_id}
-                                            </Card.Text>
+                                            <Card.Text>{req.user?.email}</Card.Text>
+                                        </div>
+
+                                        {/* Статус */}
+                                        <div>
                                             <Card.Text
                                                 className={`text-${
                                                     req.status === "APPROVED"
                                                         ? "success"
-                                                        : req.status ===
-                                                          "REJECTED"
+                                                        : req.status === "REJECTED"
                                                         ? "danger"
                                                         : "warning"
                                                 }`}
                                             >
-                                                Статус: {req.status}
+                                                {req.status}
                                             </Card.Text>
                                         </div>
 
-                                        <Button
-                                            variant="link"
-                                            onClick={() =>
-                                                handleViewDocuments(
-                                                    req.documents || []
-                                                )
-                                            }
-                                        >
-                                            Просмотреть документы
-                                        </Button>
-                                        <ShowDocuments
-                                            show={showDocumentsModal}
-                                            handleClose={
-                                                handleCloseDocumentsModal
-                                            }
-                                            eventId={req.event_id}
-                                        />
-                                        {/* Действия администратора */}
-                                        {selectedList === "adminRequests" &&
-                                            req.status === "PENDING" && (
+                                        {/* Название мероприятия */}
+                                        <div style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
+                                            <Card.Text>
+                                                {selectedList === "adminRequests"
+                                                    ? getEventNameById(req.event_id)
+                                                    : getUserEventNameById(req.event_id)}
+                                            </Card.Text>
+                                        </div>
+
+                                        {/* Документы */}
+                                        <div>
+                                            {req?.role === "PARTICIPANT" && req.artifacts && (
+                                                <Button variant="link" onClick={() => handleViewDocuments(req.artifacts[0])}>
+                                                    Просмотреть
+                                                </Button>
+                                                
+                                            )}
+                                            <ShowDocuments
+                                                show={showDocumentsModal}
+                                                documents={documents}
+                                                handleClose={handleCloseDocumentsModal}
+                                            />
+                                        </div>
+
+                                        {/* Действия */}
+                                        <div>
+                                            {selectedList === "adminRequests" && req.status === "PENDING" ? (
                                                 <Dropdown>
-                                                    <Dropdown.Toggle
-                                                        variant="secondary"
-                                                        size="sm"
-                                                    >
+                                                    <Dropdown.Toggle variant="secondary" size="sm">
                                                         Действия
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu>
                                                         <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleUpdateStatus(
-                                                                    req.event_id,
-                                                                    req.user_id,
-                                                                    "APPROVED"
-                                                                )
-                                                            }
+                                                            onClick={() => handleUpdateStatus(req.event_id, req.user_id, "APPROVED")}
                                                         >
                                                             Подтвердить
                                                         </Dropdown.Item>
                                                         <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleUpdateStatus(
-                                                                    req.event_id,
-                                                                    req.user_id,
-                                                                    "REJECTED"
-                                                                )
-                                                            }
+                                                            onClick={() => handleUpdateStatus(req.event_id, req.user_id, "REJECTED")}
                                                         >
                                                             Отклонить
                                                         </Dropdown.Item>
                                                         <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleUpdateStatus(
-                                                                    req.event_id,
-                                                                    req.user_id,
-                                                                    "CANCELED"
-                                                                )
-                                                            }
+                                                            onClick={() => handleUpdateStatus(req.event_id, req.user_id, "CANCELED")}
                                                         >
                                                             Закрыть
                                                         </Dropdown.Item>
                                                     </Dropdown.Menu>
                                                 </Dropdown>
+                                            ) : (
+                                                "Действий нет"
                                             )}
+                                        </div>
                                     </Card.Body>
                                 </Card>
                             ))}
