@@ -104,6 +104,7 @@ class EventWithSubEventsResponse(BaseModel):
     location: str | None = None
     created_at: datetime
     logo_url: str | None = None
+    requires_participants: bool = False
     sub_events: list[SubEventResponse]
 
     model_config = SettingsConfigDict(from_attributes=True)
@@ -122,6 +123,7 @@ class EventParticipantResponse(BaseModel):
 
 class EventParticipantResponseRequests(EventParticipantResponse):
     user: UserRead
+
 
 class EventWithSubEvents(EventResponse):
     sub_events: list[EventResponse] = []

@@ -135,7 +135,7 @@ class EventParticipantDAO(BaseDAO):
 
     @staticmethod
     async def get_participation_requests_event(
-            session: AsyncSession, event_id: UUID4, user_id: uuid.UUID, status_filter: ParticipantStatus | None = None
+        session: AsyncSession, event_id: UUID4, user_id: uuid.UUID, status_filter: ParticipantStatus | None = None
     ):
         query = select(EventParticipant).join(User, user_id == User.id).filter(EventParticipant.event_id == event_id)
 
@@ -169,6 +169,7 @@ class EventParticipantDAO(BaseDAO):
         query = (
             select(EventParticipant)
             .join(Event)
+            .join(User, User.id == user_id)
             .filter(EventParticipant.user_id == user_id, Event.requires_participants == True)
         )
         result = await session.execute(query)
