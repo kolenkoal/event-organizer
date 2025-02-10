@@ -16,13 +16,16 @@ const UNIQUE_MESSAGES = {
 }
 
 export const handleRequestError = (error) => {
-    console.log(error.response.statusText)
+    console.log(error.response)
     if (axios.isAxiosError(error)) {
         const errorDetail = error.response?.data?.detail;
-
+        console.log('error detail', errorDetail[0])
         if (errorDetail && UNIQUE_MESSAGES[errorDetail]) {
             alert(`${error.request.status || 'Ошибка'}: ${UNIQUE_MESSAGES[errorDetail]}`, ); 
-        } else {
+        } else if (errorDetail[0].msg) {
+            alert(`${error.request.status || 'Ошибка'}: ${errorDetail[0].msg}`)
+        }
+        else {
             alert(`${error.request.status || "Ошибка"}: ${errorDetail || 'Неизвестная ошибка' }`);
         }
     } else {

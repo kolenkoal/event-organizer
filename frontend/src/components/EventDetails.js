@@ -46,7 +46,7 @@ const EventDetails = observer(({
     useEffect(() => {
         setLogoUrl(eventInfo.logo_url)
     }, [eventInfo.logo_url]);
-
+    console.log('event info', eventInfo)
     useEffect(() => {
         const fetchSubEventParticipants = async () => {
             if (eventInfo.sub_events && eventInfo.sub_events.length > 0) {
@@ -190,6 +190,7 @@ const EventDetails = observer(({
                                             >
                                                 Зарегистрироваться
                                             </Button>
+                                            
                                             <Button
                                                 variant="warning"
                                                 size="lg"

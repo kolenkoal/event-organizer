@@ -53,7 +53,7 @@ const PersonalAccount = () => {
 
     return (
         <Container className="mt-4">
-            <h2 className="mb-4">Личный кабинет</h2>
+            <h2 className="mb-4 text-center">Личный кабинет</h2>
 
             <Dropdown>
                 <Dropdown.Toggle variant="primary" id="dropdown-basic">
@@ -73,7 +73,7 @@ const PersonalAccount = () => {
 
             {selectedList && (
                 <>
-                    <h4 className="mt-4">
+                    <h4 className="mt-4 text-center">
                         {selectedList === "created"
                             ? "Созданные мероприятия"
                             : "Мероприятия, в которых участвую"}
@@ -85,7 +85,7 @@ const PersonalAccount = () => {
                             ))}
                         </ListGroup>
                     ) : (
-                        <p className="mt-2">Список пуст</p>
+                        <p className="mt-2 text-center">Список пуст</p>
                     )}
                 </>
             )}

@@ -117,12 +117,12 @@ const RequestsPage = ({ userId }) => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     <Dropdown.Item
-                        onClick={() => setSelectedList("userRequests")}
+                        onClick={() => setSelectedList("adminRequests")}
                     >
                         Заявки на мои мероприятия
                     </Dropdown.Item>
                     <Dropdown.Item
-                        onClick={() => setSelectedList("adminRequests")}
+                        onClick={() => setSelectedList("userRequests")}
                     >
                         Мои заявки на участие
                     </Dropdown.Item>
