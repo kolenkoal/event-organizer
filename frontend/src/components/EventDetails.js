@@ -46,7 +46,7 @@ const EventDetails = observer(({
     useEffect(() => {
         setLogoUrl(eventInfo.logo_url)
     }, [eventInfo.logo_url]);
-    console.log('event info', eventInfo)
+    
     useEffect(() => {
         const fetchSubEventParticipants = async () => {
             if (eventInfo.sub_events && eventInfo.sub_events.length > 0) {
@@ -190,17 +190,19 @@ const EventDetails = observer(({
                                             >
                                                 Зарегистрироваться
                                             </Button>
+                                            {eventInfo.require_participants === true && (
+                                                <Button
+                                                    variant="warning"
+                                                    size="lg"
+                                                    className="shadow w-100"
+                                                    onClick={() =>
+                                                        setRequestVisible(true)
+                                                    }
+                                                >
+                                                    Подать заявку
+                                                </Button>
+                                            )}
                                             
-                                            <Button
-                                                variant="warning"
-                                                size="lg"
-                                                className="shadow w-100"
-                                                onClick={() =>
-                                                    setRequestVisible(true)
-                                                }
-                                            >
-                                                Подать заявку
-                                            </Button>
                                             <CreateRequest
                                                 show={isRequestVisible}
                                                 onHide={() =>{

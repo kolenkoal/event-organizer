@@ -49,11 +49,23 @@ const RequestsPage = ({ userId }) => {
             })
             .catch((err) => setError(err.message));
         
-        // Загружаем заявки пользователя на участие в мероприятиях
         getUserEvents()
-            .then((data) => setUserRequests(data))
-            .catch((err) => setError(err.message))
-            .finally(() => setLoading(false));
+        .then((userEvents) => {
+            
+            return Promise.all(
+                userEvents.map((event) =>
+                    FetchOneEvent(event.event_id).then((eventDetails) => ({
+                        ...event, 
+                        event_name: eventDetails.title, 
+                    }))
+                )
+            );
+        })
+        .then((userEventsWithNames) => {
+            setUserRequests(userEventsWithNames); 
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
     }, []);
     // console.log('user request', userRequests)
 
@@ -63,8 +75,8 @@ const RequestsPage = ({ userId }) => {
     }
 
     const getUserEventNameById = (eventId) => {
-        const event = userRequests.find(event => event.id === eventId)
-        return event ? event.title : 'Мероприятие не найдено'
+        const event = userRequests.find(event => event.event_id === eventId)
+        return event ? event.event_name : 'Мероприятие не найдено'
     };
 
     const handleUpdateStatus = (eventId, userId, newStatus) => {
@@ -178,7 +190,7 @@ const RequestsPage = ({ userId }) => {
                                             <Card.Title className="mb-1">
                                                 {selectedList === "adminRequests"
                                                     ? req.user.first_name + " " + req.user.last_name
-                                                    : req.event_id}
+                                                    : req.user.first_name + " " + req.user.last_name}
                                             </Card.Title>
                                             <Card.Text>{req.user?.email}</Card.Text>
                                         </div>

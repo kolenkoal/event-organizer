@@ -36,7 +36,7 @@ const SubEvents = ({
     useEffect(() => {
         const newSubEvents = getSubEvents(event, parentEventId)
         setSubEvents(newSubEvents)
-        console.log('subevents', newSubEvents)
+        // console.log('subevents', newSubEvents)
     }, [event])
 
     return (
