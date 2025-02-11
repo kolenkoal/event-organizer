@@ -29,7 +29,7 @@ const CreateRequest = ({ show, onHide, eventId, token, onRegisterLikeParticipant
         formData.append("artifacts", selectedFile);
         try {
             // const fileName = files[0].name
-            console.log(selectedFile);
+            // console.log(selectedFile);
             onRegisterLikeParticipant(eventId, formData)
             // const pathName = output.artifacts[0];
             // localStorage.setItem(`eventDocument_${eventId}`, pathName);

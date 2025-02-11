@@ -57,7 +57,7 @@ const EventItem = ({ event, isAuth }) => {
 
                     <Col xs={12} sm={6} md={2} className="d-flex justify-content-center">
                         <div>
-                            <strong>Кончало:</strong>{" "}
+                            <strong>Окончание:</strong>{" "}
                             {new Date(event.end_time).toLocaleDateString(
                                 "ru-Ru",
                                 {

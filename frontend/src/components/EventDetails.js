@@ -42,7 +42,7 @@ const EventDetails = observer(({
     const [isHovered, setIsHovered] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [totalSubEventParticipants, setTotalSubEventParticipants] = useState(0);
-
+    // console.log('eventInfo', eventInfo)
     useEffect(() => {
         setLogoUrl(eventInfo.logo_url)
     }, [eventInfo.logo_url]);
@@ -190,7 +190,7 @@ const EventDetails = observer(({
                                             >
                                                 Зарегистрироваться
                                             </Button>
-                                            {eventInfo.require_participants === true && (
+                                            {eventInfo.requires_participants === true && (
                                                 <Button
                                                     variant="warning"
                                                     size="lg"
