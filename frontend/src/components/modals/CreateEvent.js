@@ -38,9 +38,10 @@ const CreateEvent = observer(({ show, onHide, eventInfo }) => {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-
+    console.log(eventInfo)
     useEffect(() => {
         if (eventInfo) {
+            console.log(eventInfo)
             setTitle(eventInfo.title || "");
             setStartDate(eventInfo.start_time ? formatDateForInput(eventInfo.start_time) : "");
             setEndDate(eventInfo.end_time ? formatDateForInput(eventInfo.end_time) : "");

@@ -46,7 +46,7 @@ const EventDetails = observer(({
     useEffect(() => {
         setLogoUrl(eventInfo.logo_url)
     }, [eventInfo.logo_url]);
-    
+    // console.log()
     useEffect(() => {
         const fetchSubEventParticipants = async () => {
             if (eventInfo.sub_events && eventInfo.sub_events.length > 0) {
@@ -156,7 +156,7 @@ const EventDetails = observer(({
                                         Изменить
                                     </Button>
                                     <CreateEvent
-                                        event={eventInfo}
+                                        eventInfo={eventInfo}
                                         show={isEventVisible}
                                         onHide={() => setEventVisible(false)}
                                     />
