@@ -13,6 +13,7 @@ import {
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import CreateEvent from "./modals/CreateEvent";
+import QuestionModal from "./modals/QuestionModal";
 
 const NavBar = observer(() => {
     const { user } = useContext(Context);
@@ -125,7 +126,7 @@ const NavBar = observer(() => {
                                 Войти
                             </Button>
                         </Nav>
-                    )}
+                    )} 
                 </Container>
             </Navbar>
         </>

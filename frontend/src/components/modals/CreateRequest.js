@@ -51,7 +51,7 @@ const CreateRequest = ({ show, onHide, eventId, token, onRegisterLikeParticipant
             <Modal.Body>
                 <Form>
                     <Form.Group controlId="formFileMultiple" className="mb-3">
-                        <Form.Label>Прикрепите документы</Form.Label>
+                        <Form.Label>Прикрепите документы (.pdf, .png, .jpeg, .gif)</Form.Label>
                         <Form.Control
                             type="file"
                             multiple

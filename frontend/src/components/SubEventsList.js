@@ -47,7 +47,7 @@ const SubEventList = ({ subevents, onRegister, onUnregister, isCreator, onSubEve
                 <Card className="mb-3 shadow-sm" style={{position: "sticky", top: 0, zIndex: 10, background: "white"}}>
                     <Card.Body
                         className="d-grid text-center fw-bold"
-                        style={{ gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 1fr 1fr", gap: "10px" }}
+                        style={{ gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 1fr 2fr", gap: "10px" }}
                     >
                         <div>Название</div>
                         <div>Описание</div>

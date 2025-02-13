@@ -99,3 +99,13 @@ export const PatchUser = async (userId, email, password, first_name, last_name, 
         handleRequestError(error)
     }
 }
+
+export const getUserByID = async (userId) => {
+    try {
+        const {data} = await $authHost.get(`api/v1/users/${userId}`)
+
+        return data
+    } catch (error) {
+        handleRequestError(error)
+    }
+}

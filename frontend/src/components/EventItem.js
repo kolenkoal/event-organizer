@@ -12,7 +12,6 @@ const EventItem = ({ event, isAuth }) => {
         <>
             <Card
                 className="mb-3 p-2 border rounded bg-light shadow"
-                border="light"
                 onClick={() => {
                     if (isAuth) {
                         navigate(EVENT_ROUTE + "/" + event.id)

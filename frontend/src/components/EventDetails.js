@@ -7,7 +7,8 @@ import {
     Collapse,
     ListGroup,
     Image,
-    Offcanvas
+    Offcanvas,
+    Card
 } from "react-bootstrap";
 import CreateEvent from "./modals/CreateEvent";
 import SubEvents from "./SubEvents";
@@ -17,7 +18,7 @@ import LogoUploadModal from "./modals/LogoUploadModal";
 import AdminRequestsSidebar from "./AdminRequestsSidebar";
 import ParticipantsSidebar from "./ParticipantsSidebar";
 import { observer } from "mobx-react-lite";
-import { FetchEventParticipants } from "../http/EventApi";
+import { FetchEventParticipants, getEventListeners } from "../http/EventApi";
 
 const EventDetails = observer(({
     eventInfo,
@@ -42,6 +43,8 @@ const EventDetails = observer(({
     const [isHovered, setIsHovered] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [totalSubEventParticipants, setTotalSubEventParticipants] = useState(0);
+
+    const [newListeners, setNewListeners] = useState([])
     // console.log('eventInfo', eventInfo)
     useEffect(() => {
         setLogoUrl(eventInfo.logo_url)
@@ -64,8 +67,11 @@ const EventDetails = observer(({
             }
         };
 
+        // getEventListeners(eventInfo.id).then((data) => {
+        //     setNewListeners(data.listeners)
+        // })
         fetchSubEventParticipants();
-    }, [eventInfo.sub_events]);
+    }, [eventInfo.sub_events, listeners.length]);
     
     return (
         <div className="d-flex flex-column">
@@ -238,7 +244,36 @@ const EventDetails = observer(({
             <Container className="flex-grow-1 d-flex flex-column justify-content-between py-4">
                 <Row className="text-center my-3">
                     <Col>
-                        <h5>Дата начала</h5>
+                        <Card>
+                            <Card.Header> 
+                                Локация
+                            </Card.Header>
+                            <Card.Body>
+                                {eventInfo.location}
+                            </Card.Body>
+                        </Card>
+                        {/* <h5>Локация</h5>
+                        <p className="text-muted">{eventInfo.location}</p> */}
+                    </Col>
+                    <Col>
+                        <Card>
+                            <Card.Header> 
+                                Дата начала
+                            </Card.Header>
+                            <Card.Body>
+                                {new Date(eventInfo.start_time).toLocaleString(
+                                    "ru-RU",
+                                    {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    }
+                                )}
+                            </Card.Body>
+                        </Card>
+                        {/* <h5>Дата начала</h5>
                         <p className="text-muted">
                             {new Date(eventInfo.start_time).toLocaleString(
                                 "ru-RU",
@@ -250,14 +285,25 @@ const EventDetails = observer(({
                                     minute: "2-digit",
                                 }
                             )}
-                        </p>
+                        </p> */}
                     </Col>
+                    
                     <Col>
-                        <h5>Локация</h5>
-                        <p className="text-muted">{eventInfo.location}</p>
-                    </Col>
-                    <Col>
-                        <h5>Дата окончания</h5>
+                        <Card>
+                            <Card.Header> 
+                                Дата окончания
+                            </Card.Header>
+                            <Card.Body>
+                                {new Date(eventInfo.end_time).toLocaleString("ru-RU", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })}
+                            </Card.Body>
+                        </Card>
+                        {/* <h5>Дата окончания</h5>
                         <p className="text-muted">
                             {new Date(eventInfo.end_time).toLocaleString("ru-RU", {
                                 year: "numeric",
@@ -266,14 +312,23 @@ const EventDetails = observer(({
                                 hour: "2-digit",
                                 minute: "2-digit",
                             })}
-                        </p>
+                        </p> */}
                     </Col>
                     <Col>
-                        <h5>Всего людей</h5>
+                        <Card>
+                            <Card.Header> 
+                                Всего людей
+                            </Card.Header>
+                            <Card.Body>
+                                {listeners.length + participants.length + totalSubEventParticipants + ` (В подмероприятиях: ${totalSubEventParticipants})`}
+                                {/* {` (В подмероприятиях: ${totalSubEventParticipants})`} */}
+                            </Card.Body>
+                        </Card>
+                        {/* <h5>Всего людей</h5>
                         <p className="text-muted">
                             {listeners.length + participants.length + totalSubEventParticipants}
                             {` (В подмероприятиях: ${totalSubEventParticipants})`}
-                        </p>
+                        </p> */}
                     </Col>
                 </Row>
 
@@ -294,8 +349,8 @@ const EventDetails = observer(({
                 </Row>
 
                 {eventInfo.sub_events && (
-                    <Row className="mt-4">
-                        <Col>
+                    // <Row className="mt-4">
+                    //     <Col>
                             <SubEvents
                                 subevents={eventInfo.sub_events}
                                 onDeleteItem={onDeleteItem}
@@ -311,8 +366,8 @@ const EventDetails = observer(({
                                 }
                                 userId={userId}
                             />
-                        </Col>
-                    </Row>
+                    //     {/* </Col>
+                    // </Row> */}
                 )}
             </Container>
         </div>

@@ -4,9 +4,11 @@ import { Container, Row, Col, Button, Card } from "react-bootstrap";
 import CreateEvent from "../components/modals/CreateEvent";
 import { useNavigate } from "react-router";
 import { EVENTS_ROUTE } from "../utils/consts";
+import QuestionModal from "../components/modals/QuestionModal";
 
 const Main = observer(() => {
     const [eventVisible, setEventVisible] = useState(false)
+    const [helperVisible, setHelperVisible] = useState(false)
     const navigate = useNavigate()
     return (
         <Container className="text-center mt-5">
@@ -33,6 +35,17 @@ const Main = observer(() => {
             >
                 Найти мероприятие
             </Button>
+            <Button
+                variant="outline-primary" 
+                className="m-2"
+                onClick={() => setHelperVisible(true)}
+            >
+                Как пользоваться ?
+            </Button>
+            <QuestionModal 
+                show={helperVisible}
+                onHide={() => setHelperVisible(false)}
+            />
             </Col>
         </Row>
 
@@ -59,6 +72,25 @@ const Main = observer(() => {
                 <Card.Body>
                 <Card.Title>Сообщество</Card.Title>
                 <Card.Text>Находите мероприятия по душе и участвуйте!</Card.Text>
+                </Card.Body>
+            </Card>
+            </Col>
+            
+        </Row>
+        <Row className='mt-5'>
+        <Col md={6}>
+            <Card>
+                <Card.Body>
+                <Card.Title>Приходите и слушайте !</Card.Title>
+                <Card.Text>Для этого зарегистрируйтесь на мероприятие !</Card.Text>
+                </Card.Body>
+            </Card>
+            </Col>
+            <Col md={6}>
+            <Card>
+                <Card.Body>
+                <Card.Title>Приходите и участвуйте !</Card.Title>
+                <Card.Text>Просто подайте заявку на странице мероприятия !</Card.Text>
                 </Card.Body>
             </Card>
             </Col>

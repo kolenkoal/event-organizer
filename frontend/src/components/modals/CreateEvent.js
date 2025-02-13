@@ -38,7 +38,7 @@ const CreateEvent = observer(({ show, onHide, eventInfo }) => {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-    console.log(eventInfo)
+    // console.log(eventInfo)
     useEffect(() => {
         if (eventInfo) {
             console.log(eventInfo)

@@ -19,6 +19,7 @@ import EventDetails from "../components/EventDetails";
 import { PROFILE_ROUTE } from "../utils/consts";
 import { Context } from "..";
 import { observer } from "mobx-react-lite";
+import { getUserByID } from "../http/userApi";
 
 const EventPage = observer(() => {
     const { user, event } = useContext(Context);
@@ -83,10 +84,13 @@ const EventPage = observer(() => {
         if (!eventId) {
             RegisterForEvent(id, info).then((data) => {
                 if (data) {
+                    console.log('data', data)
                     setRegistered(true);
-                    setParticipants((prevParticipants) => [
+                    console.log(user._user)
+                    setListeners((prevParticipants) => [
                         ...prevParticipants,
-                        { user_id: user._user.id },
+                        {user: user._user}
+                        // { user_id: user._user.id },
                     ]);
                 }
             });
@@ -97,9 +101,9 @@ const EventPage = observer(() => {
         RegisterForEvent(eventId, info).then((data) => {
             if (data) {
                 // setRegisteredForSubEvent(true);
-                setParticipants((prevParticipants) => [
+                setListeners((prevParticipants) => [
                     ...prevParticipants,
-                    { user_id: user._user.id },
+                    {user: user._user},
                 ]);
             }
         });
@@ -112,11 +116,19 @@ const EventPage = observer(() => {
         if(!eventId) {
             RequestParticipation(eventId, formData).then((data) => {
                 setRegistered(true)
+                setParticipants((prevParticipants) => [
+                    ...prevParticipants,
+                    {user: user._user}
+                ])
             })
         }
 
         RequestParticipation(eventId, formData).then((data) => {
             setRegistered(true)
+            setParticipants((prevParticipants) => [
+                ...prevParticipants,
+                {user: user._user}
+            ])
         })
 
         return true
@@ -132,12 +144,22 @@ const EventPage = observer(() => {
     const onUnregister = (eventId) => {
         if (!eventId) {
             UnregisterFromEvent(user._user.id, id).then((data) => {
+                // console.log('delete data', data)
                 setRegistered(false);
-                setParticipants((prevParticipants) => {
-                    return prevParticipants.filter(
-                        (participant) => participant.user_id !== user._user.id
+                
+                setListeners((prevListeners) => {
+                    
+                    return prevListeners.filter(
+                        (listener) => listener.user.id !== user._user.id
                     );
                 });
+                setParticipants((prevParticipants) => {
+                    
+                    return prevParticipants.filter(
+                        (listener) => listener.user.id !== user._user.id
+                    );
+                });
+                
             });
 
             return;
@@ -145,9 +167,16 @@ const EventPage = observer(() => {
 
         UnregisterFromEvent(user._user.id, eventId).then((data) => {
             // setRegisteredForSubEvent(false);
+            setListeners((prevListeners) => {
+                    
+                return prevListeners.filter(
+                    (listener) => listener.user.id !== user._user.id
+                );
+            });
             setParticipants((prevParticipants) => {
+                    
                 return prevParticipants.filter(
-                    (participant) => participant.user_id !== user._user.id
+                    (listener) => listener.user.id !== user._user.id
                 );
             });
         });

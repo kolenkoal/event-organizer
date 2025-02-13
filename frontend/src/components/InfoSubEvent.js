@@ -86,7 +86,7 @@ const InfoSubEvent = ({ event, onUnregister, isCreator, onRegister, onDeleteItem
         <Card className="mb-2 shadow-sm">
             <Card.Body
                 className="d-grid text-center"
-                style={{ gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 1fr 1fr", gap: "10px", alignItems: "center" }}
+                style={{ gridTemplateColumns: "1fr 3fr 2fr 2fr 2fr 1fr 2fr", gap: "10px", alignItems: "center" }}
             >
                 {/* Название */}
                 <div className="text-wrap">

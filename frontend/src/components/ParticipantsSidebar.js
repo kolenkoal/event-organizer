@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Offcanvas, ListGroup, Button, ToggleButtonGroup, ToggleButton } from "react-bootstrap";
+import { observer } from "mobx-react-lite";
 
 const ParticipantsSidebar = ({ show, handleClose, participants, listeners }) => {
     const [viewMode, setViewMode] = useState("listeners"); // "listeners" или "participants"
-    
+    console.log('part', participants)
+    // console.log()
     // const listeners = participants.filter((p) => p.role === "listener");
     // const activeParticipants = participants.filter((p) => p.role === "participant");
     return (
@@ -39,7 +41,7 @@ const ParticipantsSidebar = ({ show, handleClose, participants, listeners }) => 
                     ) : viewMode === "listeners" && listeners.length > 0 ? (
                         listeners.map((listener, index) => (
                             <ListGroup.Item key={index}>
-                                {listener.user.first_name} {listener.user.last_name}
+                                {listener.user ? listener.user.first_name : ''} {listener.user ? listener.user.last_name : ''}
                             </ListGroup.Item>
                         ))
                     ) : (
@@ -53,4 +55,4 @@ const ParticipantsSidebar = ({ show, handleClose, participants, listeners }) => 
     );
 };
 
-export default ParticipantsSidebar;
+export default observer(ParticipantsSidebar);
